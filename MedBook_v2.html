@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MedBook — Healthcare Booking App</title>
+<style>
+:root{
+  --teal:#1D9E75;--teal-dark:#0F6E56;--teal-light:#E1F5EE;--teal-mid:#9FE1CB;
+  --blue:#185FA5;--blue-light:#E6F1FB;--blue-mid:#B5D4F4;
+  --purple:#534AB7;--purple-light:#EEEDFE;--purple-mid:#CECBF6;
+  --amber:#BA7517;--amber-light:#FAEEDA;--amber-mid:#FAC775;
+  --red:#993C1D;--red-light:#FAECE7;--red-mid:#F5C4B3;
+  --green:#3B6D11;--green-light:#EAF3DE;
+  --text:#1a1a1a;--text2:#666;--text3:#999;
+  --border:#e5e5e5;--bg:#fff;--bg2:#f8f8f6;--bg3:#f3f2ef;
+  --radius:8px;--radius-lg:12px;
+  --font:'Segoe UI',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);font-size:14px;color:var(--text);background:#eef1ee;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px}
+.app{width:100%;max-width:940px;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;min-height:680px;display:flex;flex-direction:column;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,0.09)}
+
+/* ── LANDING ── */
+.landing{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;background:linear-gradient(160deg,#f6fdf9 0%,#eef1ee 100%)}
+.landing-logo{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.landing-logo-dot{width:14px;height:14px;border-radius:50%;background:var(--teal)}
+.landing-title{font-size:28px;font-weight:700;color:var(--text)}
+.landing-sub{font-size:15px;color:var(--text2);margin-bottom:36px;text-align:center;max-width:400px;line-height:1.6}
+.role-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;width:100%;max-width:680px}
+.role-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px 20px;cursor:pointer;background:#fff;transition:all 0.18s;text-align:center}
+.role-card:hover{border-color:var(--teal);box-shadow:0 4px 16px rgba(29,158,117,0.12);transform:translateY(-2px)}
+.role-icon{font-size:32px;margin-bottom:10px}
+.role-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.role-desc{font-size:12px;color:var(--text2);line-height:1.5}
+.role-btn{margin-top:14px;padding:7px 18px;border-radius:99px;border:none;cursor:pointer;font-size:12px;font-weight:600;font-family:var(--font);transition:all 0.15s}
+.role-btn-patient{background:var(--teal);color:#fff}
+.role-btn-doctor{background:var(--blue-light);color:var(--blue)}
+.role-btn-pharmacy{background:var(--green-light);color:var(--green)}
+.landing-footer{font-size:11px;color:var(--text3);margin-top:28px}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;border-bottom:1px solid var(--border);background:var(--bg2)}
+.logo{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block}
+.role-pill{font-size:11px;padding:3px 10px;border-radius:99px;font-weight:600}
+.rp-patient{background:var(--teal-light);color:var(--teal-dark)}
+.rp-doctor{background:var(--blue-light);color:var(--blue)}
+.rp-pharmacy{background:var(--green-light);color:var(--green)}
+.back-link{font-size:12px;color:var(--text2);cursor:pointer;border:1px solid var(--border);padding:4px 10px;border-radius:99px;background:#fff}
+.back-link:hover{border-color:var(--teal);color:var(--teal-dark)}
+.main{flex:1;display:flex;overflow:hidden}
+
+/* ── WIZARD ── */
+.wizard{flex:1;display:flex;flex-direction:column;min-width:0}
+.wprog{display:flex;align-items:center;padding:10px 20px;border-bottom:1px solid var(--border);background:#fff;overflow-x:auto}
+.si{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text3);white-space:nowrap}
+.si.active{color:var(--teal);font-weight:600}.si.done{color:var(--teal)}
+.sc{width:19px;height:19px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0}
+.si.active .sc{background:var(--teal);color:#fff;border-color:var(--teal)}
+.si.done .sc{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid)}
+.sl{flex:1;height:1px;background:var(--border);margin:0 5px;min-width:10px}
+.wbody{flex:1;padding:20px;overflow-y:auto}
+.wfoot{padding:11px 20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;background:#fff}
+.screen{display:none}.screen.active{display:block}
+label{font-size:12px;color:var(--text2);display:block;margin-bottom:4px}
+input,select,textarea{width:100%;font-size:13px;padding:8px 11px;border:1px solid var(--border);border-radius:var(--radius);background:#fff;color:var(--text);font-family:var(--font);transition:border 0.15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
+.field{margin-bottom:12px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{padding:8px 18px;border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s;font-family:var(--font)}
+.btn-primary{background:var(--teal);color:#fff}.btn-primary:hover{background:var(--teal-dark)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}.btn-ghost:hover{background:var(--bg2)}
+.sec-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px}
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* ── SYMPTOM AREA TILES ── */
+.area-tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin-bottom:14px}
+.area-tile{border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px 10px;cursor:pointer;background:#fff;transition:all 0.15s;text-align:center}
+.area-tile:hover{border-color:var(--teal);box-shadow:0 2px 8px rgba(29,158,117,0.1)}
+.area-tile.active{border-color:var(--teal);background:var(--teal-light)}
+.area-tile.has-sel{border-color:var(--teal);background:var(--teal-light)}
+.tile-icon{font-size:22px;margin-bottom:5px}
+.tile-name{font-size:11px;font-weight:600;color:var(--text)}
+.tile-count{font-size:10px;color:var(--teal-dark);margin-top:2px;font-weight:500}
+.area-tags-panel{display:none;background:var(--bg2);border-radius:var(--radius-lg);padding:14px;margin-bottom:14px;border:1px solid var(--border)}
+.area-tags-panel.open{display:block}
+.area-tags-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.area-tags-title{font-size:12px;font-weight:700}
+.close-area{font-size:18px;cursor:pointer;color:var(--text2);background:none;border:none;font-family:var(--font);line-height:1}
+.tags{display:flex;flex-wrap:wrap;gap:5px}
+.tag{font-size:11px;padding:4px 10px;border-radius:99px;border:1px solid var(--border);cursor:pointer;background:#fff;color:var(--text2);transition:all 0.12s;user-select:none;font-family:var(--font)}
+.tag:hover{border-color:var(--teal);color:var(--teal-dark)}
+.tag.on{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid);font-weight:600}
+.sel-tags-wrap{display:flex;flex-wrap:wrap;gap:5px;min-height:32px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius);background:var(--bg2)}
+.sel-tag{font-size:11px;padding:3px 8px;border-radius:99px;background:var(--teal-light);color:var(--teal-dark);border:1px solid var(--teal-mid);display:flex;align-items:center;gap:4px;font-weight:500}
+.sel-tag button{background:none;border:none;cursor:pointer;color:var(--teal-dark);font-size:14px;line-height:1;padding:0}
+.sel-empty{font-size:12px;color:var(--text3);font-style:italic}
+.sev-row{display:flex;gap:6px}
+.sev-btn{flex:1;padding:8px;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;font-size:11px;text-align:center;color:var(--text2);background:#fff;transition:all 0.12s;font-family:var(--font);font-weight:500}
+.sev-btn.on-mild{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid);font-weight:700}
+.sev-btn.on-mod{background:var(--amber-light);color:var(--amber);border-color:var(--amber-mid);font-weight:700}
+.sev-btn.on-sev{background:var(--red-light);color:var(--red);border-color:var(--red-mid);font-weight:700}
+
+/* ── SUGGEST BOX ── */
+.suggest-box{background:var(--bg2);border-radius:var(--radius-lg);padding:14px;border:1px solid var(--border)}
+.suggest-hdr{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.suggest-hdr-title{font-size:13px;font-weight:700}
+.auto-badge{font-size:10px;padding:2px 9px;border-radius:99px;background:var(--teal-light);color:var(--teal-dark);font-weight:600;white-space:nowrap}
+.spec-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px}
+.spec-card{border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;cursor:pointer;transition:all 0.15s;background:#fff}
+.spec-card:hover{border-color:var(--teal)}.spec-card.selected{border-color:var(--teal);background:var(--teal-light)}.spec-card.primary{border-color:var(--teal)}
+.spec-name{font-size:12px;font-weight:600}.spec-reason{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4}
+.match-badge{font-size:10px;padding:2px 7px;border-radius:99px;display:inline-block;margin-top:5px;font-weight:600}
+.mb-p{background:var(--teal-light);color:var(--teal-dark)}.mb-s{background:var(--amber-light);color:var(--amber)}.mb-u{background:var(--red-light);color:var(--red)}
+.urgent-warn{font-size:11px;color:var(--red);margin-top:8px;padding:7px 10px;background:var(--red-light);border-radius:var(--radius);font-weight:500}
+.empty-suggest{font-size:12px;color:var(--text2);text-align:center;padding:18px 0;font-style:italic}
+
+/* ── INSURANCE ── */
+.ins-box{background:var(--bg2);border-radius:var(--radius-lg);padding:12px;margin-bottom:12px}
+.ins-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.ins-toggle{font-size:11px;padding:3px 10px;border-radius:99px;border:1px solid var(--border);cursor:pointer;background:#fff;color:var(--text2);font-family:var(--font)}
+.ins-toggle.on{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid)}
+.ins-fields{display:none}.ins-fields.show{display:block}
+.ins-ok{font-size:11px;color:var(--teal-dark);margin-top:6px;display:none;font-weight:600}
+
+/* ── REBOOK ── */
+.rebook-cards{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.rebook-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:10px 12px;cursor:pointer;background:#fff;transition:all 0.15s;min-width:130px}
+.rebook-card:hover{border-color:var(--teal)}
+.rebook-av{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;margin-bottom:5px}
+.rebook-name{font-size:12px;font-weight:600}.rebook-spec{font-size:11px;color:var(--text2)}
+.rebook-rating{font-size:11px;color:var(--amber);margin-top:2px}
+.rebook-btn{font-size:10px;margin-top:5px;padding:3px 9px;border-radius:99px;background:var(--teal-light);color:var(--teal-dark);border:none;cursor:pointer;font-family:var(--font);font-weight:600}
+.vt-row{display:flex;gap:8px;margin-bottom:12px}
+.vt-btn{flex:1;padding:8px;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;font-size:12px;text-align:center;color:var(--text2);background:#fff;transition:all 0.12s;font-family:var(--font);font-weight:500}
+.vt-btn.on{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal);font-weight:700}
+.fbar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;align-items:center}
+.fsel{font-size:12px;padding:5px 8px;width:auto;border-radius:99px;border:1px solid var(--border)}
+.ftog{font-size:11px;padding:5px 12px;border-radius:99px;border:1px solid var(--border);cursor:pointer;background:#fff;color:var(--text2);transition:all 0.12s;font-family:var(--font)}
+.ftog.on{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid)}
+
+/* ── DOCTOR CARDS ── */
+.doc-list{display:flex;flex-direction:column;gap:10px}
+.doc-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px;background:#fff;cursor:pointer;transition:all 0.15s}
+.doc-card:hover{border-color:var(--teal)}.doc-card.selected{border-color:var(--teal);background:var(--teal-light)}
+.doc-top{display:flex;gap:11px;align-items:flex-start}
+.dav{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.av-t{background:var(--teal-light);color:var(--teal-dark)}.av-b{background:var(--blue-light);color:var(--blue)}.av-p{background:var(--purple-light);color:var(--purple)}
+.dn{font-size:13px;font-weight:700}.ds{font-size:12px;color:var(--text2);margin-top:1px}
+.dmeta{display:flex;gap:6px;margin-top:5px;flex-wrap:wrap;align-items:center}
+.dtag{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600}
+.t-h{background:var(--blue-light);color:var(--blue)}.t-o{background:var(--purple-light);color:var(--purple)}.t-d{background:var(--green-light);color:var(--green)}.t-a{background:var(--teal-light);color:var(--teal-dark)}
+.star-row{display:flex;align-items:center;gap:5px;margin-top:6px}
+.stars{display:flex;gap:1px}.star{font-size:13px;line-height:1;color:#ddd}.star.full,.star.half{color:#EF9F27}
+.rating-num{font-size:13px;font-weight:700;color:var(--amber)}.rating-count{font-size:11px;color:var(--text2)}
+.rating-bars{margin-top:5px}
+.rbar-row{display:flex;align-items:center;gap:5px;margin-bottom:2px}
+.rbar-lbl{font-size:10px;color:var(--text2);min-width:8px;text-align:right}
+.rbar-track{flex:1;height:4px;background:var(--bg3);border-radius:2px}
+.rbar-fill{height:100%;border-radius:2px;background:#EF9F27}
+.reviews-panel{display:none;margin-top:10px;border-top:1px solid var(--border);padding-top:10px}
+.reviews-panel.open{display:block}
+.review-item{padding:8px 0;border-bottom:1px solid var(--border)}.review-item:last-child{border-bottom:none}
+.review-top{display:flex;justify-content:space-between}
+.reviewer-name{font-size:12px;font-weight:600}.review-date{font-size:10px;color:var(--text2)}
+.review-stars{display:flex;gap:1px;margin:3px 0}
+.review-text{font-size:12px;color:var(--text2);line-height:1.5}
+.review-tags{display:flex;gap:4px;margin-top:4px;flex-wrap:wrap}
+.rtag{font-size:10px;padding:2px 7px;border-radius:99px;background:var(--bg3);color:var(--text2)}
+.see-btn{font-size:11px;color:var(--blue);cursor:pointer;background:none;border:none;font-family:var(--font);padding:0;margin-top:6px;display:block}
+.dslots{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.schip{font-size:11px;padding:4px 9px;border-radius:99px;border:1px solid var(--border);cursor:pointer;background:#fff;color:var(--text2);transition:all 0.12s;font-family:var(--font)}
+.schip:hover{border-color:var(--teal);color:var(--teal-dark)}.schip.picked{background:var(--teal);color:#fff;border-color:var(--teal)}
+.no-res{font-size:13px;color:var(--text2);padding:24px 0;text-align:center;display:none}
+
+/* ── PAYMENT ── */
+.pay-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:15px;background:#fff;margin-bottom:12px}
+.pay-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px}
+.pay-row:last-child{border-bottom:none}.pay-row .lbl{color:var(--text2)}.pay-row.total{font-weight:700;font-size:14px}.pay-row.ins-row{color:var(--teal-dark);font-weight:600}
+.pay-methods{display:flex;gap:8px;margin:10px 0;flex-wrap:wrap}
+.pm{flex:1;min-width:80px;border:1px solid var(--border);border-radius:var(--radius);padding:10px;cursor:pointer;text-align:center;font-size:12px;color:var(--text2);transition:all 0.12s;background:#fff;font-family:var(--font)}
+.pm:hover{border-color:var(--teal)}.pm.on{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);font-weight:600}
+.pm-icon{font-size:17px;margin-bottom:3px}
+.pay-input-area{display:none}.pay-input-area.show{display:block}
+.bank-detail{background:var(--bg2);border-radius:var(--radius);padding:12px;margin-top:8px}
+.ussd-code{background:var(--bg2);border-radius:var(--radius);padding:13px;text-align:center;margin-top:8px;font-size:14px;font-weight:700}
+.success-screen{text-align:center;padding:26px 18px}
+.suc-icon{width:52px;height:52px;border-radius:50%;background:var(--teal-light);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;color:var(--teal-dark)}
+.review-form{border:1px solid var(--border);border-radius:var(--radius-lg);padding:15px;background:#fff;margin-top:12px;text-align:left}
+.star-input{display:flex;gap:5px;margin:6px 0 10px}
+.star-input span{font-size:24px;cursor:pointer;color:#ddd;transition:color 0.1s}
+.star-input span.lit{color:#EF9F27}
+.review-cats{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0}
+.rcat{font-size:11px;padding:4px 10px;border-radius:99px;border:1px solid var(--border);cursor:pointer;color:var(--text2);background:#fff;transition:all 0.12s;font-family:var(--font)}
+.rcat.on{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid)}
+.review-sent{font-size:12px;color:var(--teal-dark);font-weight:600;display:none;margin-top:8px}
+.notif{display:flex;gap:9px;padding:8px 11px;border-radius:var(--radius);border:1px solid var(--border);margin-bottom:5px;background:#fff}
+.ndot{width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:5px}
+.ndot.read{background:var(--border)}.ntext{font-size:12px;line-height:1.5}.ntime{font-size:10px;color:var(--text2);margin-top:2px}
+
+/* ── CHAT ── */
+.chat-wrap{display:flex;height:370px;border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.csidebar{width:155px;border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--bg2)}
+.csidebar-hdr{padding:9px 11px;font-size:11px;font-weight:700;color:var(--text2);border-bottom:1px solid var(--border)}
+.clist{flex:1;overflow-y:auto}
+.citem{padding:9px 11px;cursor:pointer;border-bottom:1px solid var(--border);transition:all 0.12s}
+.citem:hover{background:#fff}.citem.active{background:#fff;border-left:2px solid var(--teal)}
+.citem-name{font-size:12px;font-weight:600}.citem-prev{font-size:11px;color:var(--text2);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:120px}.citem-time{font-size:10px;color:var(--text3);margin-top:1px}
+.udot{width:6px;height:6px;border-radius:50%;background:var(--teal);display:inline-block;margin-left:3px}
+.cmain{flex:1;display:flex;flex-direction:column;min-width:0}
+.chdr{padding:9px 13px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;background:#fff}
+.chdr-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;background:var(--teal-light);color:var(--teal-dark);flex-shrink:0}
+.chdr-name{font-size:12px;font-weight:700}.chdr-sub{font-size:11px;color:var(--text2)}
+.cmsgs{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:7px}
+.msg{max-width:78%;display:flex;flex-direction:column;gap:2px}.msg.me{align-self:flex-end;align-items:flex-end}.msg.them{align-self:flex-start}
+.mbub{padding:7px 10px;border-radius:10px;font-size:12px;line-height:1.5}
+.msg.me .mbub{background:var(--teal);color:#fff;border-bottom-right-radius:2px}
+.msg.them .mbub{background:var(--bg2);color:var(--text);border-bottom-left-radius:2px}
+.mtime{font-size:10px;color:var(--text3)}
+.cinput-area{padding:9px 12px;border-top:1px solid var(--border);display:flex;gap:7px;align-items:center;background:#fff}
+.cinput{flex:1;font-size:12px;padding:7px 11px;border:1px solid var(--border);border-radius:99px;background:#fff;color:var(--text);font-family:var(--font)}
+.cinput:focus{outline:none;border-color:var(--teal)}
+.sbtn{width:30px;height:30px;border-radius:50%;background:var(--teal);border:none;cursor:pointer;color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── DOCTOR PANEL ── */
+.dp{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.dptabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg2);overflow-x:auto}
+.dptab{padding:9px 13px;font-size:12px;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);white-space:nowrap;transition:all 0.15s;font-family:var(--font)}
+.dptab.active{border-bottom-color:var(--teal);color:var(--teal);font-weight:700}
+.dpbody{flex:1;overflow-y:auto;padding:16px}
+.dpsec{display:none}.dpsec.active{display:block}
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:14px}
+.sbox{background:var(--bg2);border-radius:var(--radius);padding:9px;text-align:center;border:1px solid var(--border)}
+.snum{font-size:20px;font-weight:700}.slbl{font-size:10px;color:var(--text2);margin-top:1px}
+.hi{display:flex;gap:11px;padding:8px 0;border-bottom:1px solid var(--border)}.hi:last-child{border-bottom:none}
+.hdate{font-size:11px;color:var(--text2);min-width:54px;flex-shrink:0}
+.htitle{font-size:12px;font-weight:600}.hsub{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4}
+.badge{font-size:10px;padding:2px 6px;border-radius:99px;margin-left:4px;font-weight:600}
+.bh{background:var(--blue-light);color:var(--blue)}.bo{background:var(--purple-light);color:var(--purple)}
+.pill{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;white-space:nowrap}
+.pp-p{background:var(--amber-light);color:var(--amber)}.pc{background:var(--teal-light);color:var(--teal-dark)}
+.ic{border:1px solid var(--border);border-radius:var(--radius);padding:11px;margin-bottom:8px;background:#fff}
+.itop{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.iname{font-size:13px;font-weight:700}.imeta{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.5}
+.iactions{display:flex;gap:5px;margin-top:8px;flex-wrap:wrap}
+.iactions button{font-size:11px;padding:4px 9px;border-radius:var(--radius);cursor:pointer;border:1px solid var(--border);background:var(--bg2);color:var(--text);font-family:var(--font);font-weight:500}
+.bci{background:var(--teal-light)!important;color:var(--teal-dark)!important;border-color:var(--teal-mid)!important}
+.bdc{background:var(--red-light)!important;color:var(--red)!important;border-color:var(--red-mid)!important}
+.dr-review-summary{background:var(--bg2);border-radius:var(--radius-lg);padding:15px;margin-bottom:13px;display:flex;gap:18px;align-items:center;border:1px solid var(--border)}
+.dr-big-score{text-align:center}.dr-big-num{font-size:38px;font-weight:700;color:var(--amber);line-height:1}
+.dr-big-stars{display:flex;gap:2px;justify-content:center;margin:4px 0;font-size:15px;color:#EF9F27}
+.dr-big-count{font-size:11px;color:var(--text2)}.dr-bars{flex:1}
+.dr-bar-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.dr-bar-lbl{font-size:11px;color:var(--text2);min-width:10px;text-align:right}
+.dr-bar-track{flex:1;height:5px;background:var(--border);border-radius:2px}
+.dr-bar-fill{height:100%;border-radius:2px;background:#EF9F27}
+.dr-bar-n{font-size:10px;color:var(--text2);min-width:20px}
+.dr-review-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;margin-bottom:8px;background:#fff}
+.drv-top{display:flex;justify-content:space-between;margin-bottom:5px}
+.drv-name{font-size:12px;font-weight:600}.drv-date{font-size:10px;color:var(--text2)}
+.drv-stars{display:flex;gap:1px;margin-bottom:4px;font-size:13px;color:#EF9F27}
+.drv-text{font-size:12px;color:var(--text2);line-height:1.5}
+.drv-tags{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap}
+.dvtag{font-size:10px;padding:2px 7px;border-radius:99px;background:var(--bg3);color:var(--text2)}
+.rx-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:12px;background:#fff;margin-bottom:8px}
+.rx-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px}
+.rx-pat{font-size:13px;font-weight:700}.rx-meta{font-size:11px;color:var(--text2);margin-top:1px}
+.rxst{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600}
+.rxst.sent{background:var(--teal-light);color:var(--teal-dark)}
+.rx-drugs{display:flex;flex-direction:column;gap:3px;margin-bottom:6px}
+.rx-drug{font-size:12px;padding:4px 8px;background:var(--bg2);border-radius:var(--radius)}
+.rx-pharm{font-size:11px;color:var(--blue)}
+.add-rx{border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px;background:var(--bg2);margin-top:10px}
+.drug-row{display:flex;gap:5px;margin-bottom:5px;align-items:center}
+.drug-row input{flex:2}.drug-row input.dos{flex:1}
+.rmv{background:none;border:none;color:var(--text2);cursor:pointer;font-size:15px;padding:0 3px}
+.avail-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-top:5px}
+.aslot{border:1px solid var(--border);border-radius:var(--radius);padding:6px;text-align:center;cursor:pointer;font-size:11px;color:var(--text2);transition:all 0.12s;font-family:var(--font)}
+.aslot.on{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid);font-weight:600}
+.avtype-row{display:flex;gap:6px;margin-top:5px}
+.avtype{flex:1;border:1px solid var(--border);border-radius:var(--radius);padding:7px;cursor:pointer;font-size:12px;text-align:center;color:var(--text2);transition:all 0.12s;font-family:var(--font)}
+.avtype.on{border-color:var(--teal);background:var(--teal-light);color:var(--teal-dark);font-weight:600}
+
+/* ── DOCTOR REGISTRATION ── */
+.reg-box{background:var(--bg2);border-radius:var(--radius-lg);padding:14px;margin-bottom:12px;border:1px solid var(--border)}
+.reg-box-title{font-size:12px;font-weight:700;margin-bottom:10px}
+.id-type-row{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.id-type-btn{flex:1;min-width:120px;padding:7px 10px;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;font-size:11px;font-weight:600;text-align:center;background:#fff;color:var(--text2);transition:all 0.12s;font-family:var(--font)}
+.id-type-btn.on{background:var(--blue-light);color:var(--blue);border-color:var(--blue-mid)}
+.reg-verified{font-size:11px;color:var(--teal-dark);font-weight:600;margin-top:6px;display:none}
+.pharm-reg-box{background:var(--green-light);border-radius:var(--radius-lg);padding:14px;border:1px solid #C0DD97;margin-top:12px}
+.pharm-reg-title{font-size:13px;font-weight:700;color:var(--green);margin-bottom:4px}
+.pharm-reg-sub{font-size:12px;color:var(--green);margin-bottom:10px;line-height:1.5}
+.pharm-reg-btn{background:var(--green);color:#fff;border:none;padding:7px 16px;border-radius:var(--radius);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)}
+
+/* ── PHARMACY PANEL ── */
+.pp-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.pp-tabs{display:flex;border-bottom:1px solid var(--border);background:var(--bg2);overflow-x:auto}
+.pp-tab{padding:9px 13px;font-size:12px;cursor:pointer;border-bottom:2px solid transparent;color:var(--text2);white-space:nowrap;transition:all 0.15s;font-family:var(--font)}
+.pp-tab.active{border-bottom-color:var(--green);color:var(--green);font-weight:700}
+.pp-body{flex:1;overflow-y:auto;padding:16px}
+.pp-sec{display:none}.pp-sec.active{display:block}
+.pp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-bottom:14px}
+.rxq{border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px;background:#fff;margin-bottom:10px}
+.rxqt{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+.rxqp{font-size:13px;font-weight:700}.rxqm{font-size:11px;color:var(--text2);margin-top:2px}
+.rxqd{display:flex;flex-direction:column;gap:3px;margin-bottom:10px}
+.rxqdr{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 9px;background:var(--bg2);border-radius:var(--radius)}
+
+/* availability status buttons */
+.avail-status-row{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px}
+.avail-status-btn{padding:7px;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;font-size:11px;font-weight:600;text-align:center;background:#fff;color:var(--text2);transition:all 0.12s;font-family:var(--font)}
+.avail-status-btn:hover{border-color:var(--teal)}
+.avs-all{}.avs-none{}.avs-partial{}
+.avail-status-btn.sel-all{background:var(--teal-light);color:var(--teal-dark);border-color:var(--teal-mid)}
+.avail-status-btn.sel-none{background:var(--red-light);color:var(--red);border-color:var(--red-mid)}
+.avail-status-btn.sel-partial{background:var(--amber-light);color:var(--amber);border-color:var(--amber-mid)}
+.rx-confirm-fields{display:none;margin-top:8px}.rx-confirm-fields.show{display:block}
+.rxq-confirm-btn{width:100%;padding:8px;border-radius:var(--radius);background:var(--teal);color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);margin-top:8px}
+.rxq-done{font-size:11px;color:var(--teal-dark);font-weight:600;margin-top:6px;display:none}
+
+/* pharmacy rating */
+.pharm-rating-section{margin-top:20px}
+.pharm-card{border:1px solid var(--border);border-radius:var(--radius-lg);padding:13px;background:#fff;margin-bottom:9px}
+.pharm-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.pharm-name{font-size:13px;font-weight:700}.pharm-addr{font-size:11px;color:var(--text2);margin-top:2px}
+.pharm-stars{display:flex;align-items:center;gap:5px}
+.pharm-star-input{display:flex;gap:3px}
+.pharm-star-input span{font-size:18px;cursor:pointer;color:#ddd;transition:color 0.1s}
+.pharm-star-input span.lit{color:#EF9F27}
+.pharm-review-row{display:flex;gap:8px;margin-top:8px}
+.pharm-review-row input{flex:1}
+.pharm-submit-btn{font-size:11px;padding:6px 12px;border-radius:var(--radius);background:var(--teal);color:#fff;border:none;cursor:pointer;font-family:var(--font);font-weight:600;white-space:nowrap}
+.pharm-rated{font-size:11px;color:var(--teal-dark);font-weight:600;display:none;margin-top:6px}
+.pharm-existing-review{font-size:11px;color:var(--text2);margin-top:4px;padding:6px 8px;background:var(--bg2);border-radius:var(--radius)}
+
+.page-footer{text-align:center;margin-top:14px;font-size:11px;color:var(--text3)}
+@media(max-width:600px){.role-cards{grid-template-columns:1fr}.row2{grid-template-columns:1fr}.stats-row{grid-template-columns:1fr 1fr}.area-tiles{grid-template-columns:repeat(2,1fr)}.sev-row{flex-direction:column}.spec-cards{grid-template-columns:1fr 1fr}.csidebar{width:120px}}
+</style>
+</head>
+<body>
+
+<!-- ══ LANDING PAGE ══ -->
+<div class="app" id="app-landing">
+  <div class="landing">
+    <div class="landing-logo"><div class="landing-logo-dot"></div><div class="landing-title">MedBook</div></div>
+    <p class="landing-sub">Nigeria's healthcare booking platform — connecting patients with specialist doctors and trusted pharmacies.</p>
+    <div class="role-cards">
+      <div class="role-card" onclick="enterApp('patient')">
+        <div class="role-icon">🧑‍💼</div>
+        <div class="role-name">I'm a Patient</div>
+        <div class="role-desc">Book specialist doctors near you, manage appointments and prescriptions.</div>
+        <button class="role-btn role-btn-patient">Book a doctor</button>
+      </div>
+      <div class="role-card" onclick="enterApp('doctor')">
+        <div class="role-icon">👨‍⚕️</div>
+        <div class="role-name">I'm a Doctor</div>
+        <div class="role-desc">Register your practice, manage your schedule and consult with patients.</div>
+        <button class="role-btn role-btn-doctor">Register / Sign in</button>
+      </div>
+      <div class="role-card" onclick="enterApp('pharmacy')">
+        <div class="role-icon">💊</div>
+        <div class="role-name">I'm a Pharmacy</div>
+        <div class="role-desc">Join our pharmacy network and receive and fulfil prescriptions digitally.</div>
+        <button class="role-btn role-btn-pharmacy">Join network</button>
+      </div>
+    </div>
+    <div class="landing-footer">MedBook prototype · For demo and investor purposes only · Not a live medical product</div>
+  </div>
+</div>
+
+<!-- ══ MAIN APP ══ -->
+<div class="app" id="app-main" style="display:none">
+  <div class="topbar">
+    <div class="logo"><span class="logo-dot"></span> MedBook</div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="role-pill" id="role-pill"></span>
+      <button class="back-link" onclick="goLanding()">← Switch role</button>
+    </div>
+  </div>
+  <div class="main">
+
+  <!-- ══ PATIENT ══ -->
+  <div class="wizard" id="mode-patient" style="display:none">
+    <div class="wprog">
+      <div class="si active" id="sp1"><div class="sc">1</div>Symptoms</div><div class="sl"></div>
+      <div class="si" id="sp2"><div class="sc">2</div>Details</div><div class="sl"></div>
+      <div class="si" id="sp3"><div class="sc">3</div>Find doctor</div><div class="sl"></div>
+      <div class="si" id="sp4"><div class="sc">4</div>Payment</div><div class="sl"></div>
+      <div class="si" id="sp5"><div class="sc">5</div>Messages</div>
+    </div>
+    <div class="wbody">
+
+      <!-- S1: Symptoms -->
+      <div class="screen active" id="s1">
+        <div class="sec-title">What brings you in today?</div>
+        <div class="field">
+          <label>Describe your symptoms in your own words</label>
+          <textarea id="symp-text" rows="3" placeholder="e.g. I have had a persistent headache and blurred vision for the past 3 days, also feeling nauseous..." oninput="updateSuggestions()"></textarea>
+        </div>
+        <div class="field">
+          <label>Select affected body areas — tap an area to see symptoms</label>
+          <div class="area-tiles" id="area-tiles"></div>
+          <div class="area-tags-panel" id="area-tags-panel">
+            <div class="area-tags-hdr">
+              <span class="area-tags-title" id="area-tags-title"></span>
+              <button class="close-area" onclick="closeAreaPanel()">×</button>
+            </div>
+            <div class="tags" id="area-tags-list"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Selected symptoms</label>
+          <div class="sel-tags-wrap" id="sel-tags"><span class="sel-empty">No symptoms selected yet — tap an area above</span></div>
+        </div>
+        <div class="divider"></div>
+        <div class="row2">
+          <div class="field"><label>How long have you had these symptoms?</label>
+            <select id="duration" onchange="updateSuggestions()"><option value="">Select duration...</option><option>Started today</option><option>2–3 days</option><option>About a week</option><option>1–2 weeks</option><option>3–4 weeks</option><option>More than a month</option><option>Ongoing / chronic condition</option></select>
+          </div>
+          <div class="field"><label>Have you experienced this before?</label>
+            <select id="prev-exp" onchange="updateSuggestions()"><option value="">Select...</option><option>First time</option><option>Occasionally before</option><option>Recurring issue</option><option>Chronic / long-term</option></select>
+          </div>
+        </div>
+        <div class="field"><label>Severity</label>
+          <div class="sev-row">
+            <button class="sev-btn" id="sev-mild" onclick="setSev('mild')">😌 Mild — manageable</button>
+            <button class="sev-btn" id="sev-mod" onclick="setSev('mod')">😣 Moderate — affecting daily life</button>
+            <button class="sev-btn" id="sev-sev" onclick="setSev('sev')">🚨 Severe — need urgent care</button>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="field"><label>Specialty needed <span style="font-size:11px;color:var(--text2)">(optional — or let us suggest)</span></label>
+          <select id="specialty-select" onchange="updateSuggestions()">
+            <option value="">I'm not sure — suggest for me</option>
+            <optgroup label="Common"><option>General Practitioner</option><option>Cardiologist</option><option>Dermatologist</option><option>Neurologist</option><option>Pediatrician</option><option>Obstetrician / Gynecologist</option></optgroup>
+            <optgroup label="Internal medicine"><option>Endocrinologist</option><option>Gastroenterologist</option><option>Hematologist</option><option>Hepatologist</option><option>Infectious Disease Specialist</option><option>Nephrologist</option><option>Pulmonologist</option><option>Rheumatologist</option></optgroup>
+            <optgroup label="Surgical"><option>Orthopedic Surgeon</option><option>Vascular Surgeon</option><option>Urologist</option><option>ENT (Ear, Nose & Throat)</option><option>Ophthalmologist</option><option>Oncologist</option></optgroup>
+            <optgroup label="Mental health"><option>Psychiatrist</option><option>Psychologist</option></optgroup>
+            <optgroup label="Other"><option>Allergist / Immunologist</option><option>Geriatrician</option><option>Neonatologist</option><option>Sports Medicine</option><option>Occupational Medicine</option></optgroup>
+          </select>
+        </div>
+        <div class="divider"></div>
+        <div class="suggest-box">
+          <div class="suggest-hdr"><div><div class="suggest-hdr-title">Suggested specialists</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Based on your symptoms — not affected by your specialty preference</div></div><span class="auto-badge">Auto-matched</span></div>
+          <div id="suggest-content"><div class="empty-suggest">Select symptoms or describe them above — specialists will appear here automatically.</div></div>
+        </div>
+      </div>
+
+      <!-- S2: Patient Details -->
+      <div class="screen" id="s2">
+        <div class="sec-title">Your details</div>
+        <div class="row2"><div class="field"><label>First name</label><input type="text" id="fname" placeholder="Amara"/></div><div class="field"><label>Last name</label><input type="text" id="lname" placeholder="Okonkwo"/></div></div>
+        <div class="row2"><div class="field"><label>Date of birth</label><input type="date"/></div><div class="field"><label>Sex</label><select><option>Female</option><option>Male</option><option>Prefer not to say</option></select></div></div>
+        <div class="field"><label>Phone</label><input type="tel" placeholder="+234 800 000 0000"/></div>
+        <div class="field"><label>Home address</label><input type="text" placeholder="12 Admiralty Way, Lekki, Lagos"/></div>
+        <div class="field"><label>Allergies / existing conditions</label><input type="text" placeholder="e.g. Penicillin allergy, Type 2 diabetes"/></div>
+        <div class="field"><label>Visit preference</label>
+          <div class="avtype-row"><div class="avtype on" id="pat-home" onclick="patType('home')">🏠 Home visit</div><div class="avtype" id="pat-office" onclick="patType('office')">🏢 Office visit</div><div class="avtype" id="pat-either" onclick="patType('either')">Both OK</div></div>
+        </div>
+        <div class="ins-box">
+          <div class="ins-hdr"><span style="font-size:13px;font-weight:700">Health insurance</span><button class="ins-toggle" id="ins-tog" onclick="toggleIns()">+ Add insurance</button></div>
+          <div class="ins-fields" id="ins-fields">
+            <div class="row2"><div class="field"><label>Provider</label><select id="ins-prov"><option value="">Select...</option><option>AIICO Insurance</option><option>AXA Mansard</option><option>Hygeia HMO</option><option>Reliance HMO</option><option>Total Health Trust</option><option>Leadway Health</option><option>NHIS</option><option>ClearLine HMO</option><option>Avon HMO</option><option>Redcare HMO</option></select></div><div class="field"><label>Policy number</label><input type="text" id="ins-num" placeholder="HYG-2024-00123"/></div></div>
+            <div class="row2"><div class="field"><label>Plan type</label><select><option>Individual</option><option>Family</option><option>Corporate</option></select></div><div class="field"><label>Expiry</label><input type="date"/></div></div>
+            <button class="btn btn-primary" style="font-size:12px;padding:6px 13px" onclick="verifyIns()">Verify coverage</button>
+            <div id="ins-ok" class="ins-ok">✓ Coverage verified — 80% of consultation fees covered</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- S3: Find Doctor -->
+      <div class="screen" id="s3">
+        <div class="sec-title">Find a doctor</div>
+        <div id="rebook-sec"><div style="font-size:12px;font-weight:700;margin-bottom:7px;color:var(--text2)">Your previous doctors</div><div class="rebook-cards" id="rebook-cards"></div><div style="height:1px;background:var(--border);margin:12px 0"></div></div>
+        <div style="font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px">Visit type</div>
+        <div class="vt-row"><button class="vt-btn on" id="vt-home" onclick="setVT('home')">🏠 Home visit</button><button class="vt-btn" id="vt-office" onclick="setVT('office')">🏢 Office visit</button></div>
+        <div class="fbar">
+          <select class="fsel" id="f-avail" onchange="filterDocs()"><option value="">Any availability</option><option value="Today">Today</option><option value="Tomorrow">Tomorrow</option></select>
+          <select class="fsel" id="f-dist" onchange="filterDocs()"><option value="">Any distance</option><option value="2">Within 2km</option><option value="3">Within 3km</option><option value="5">Within 5km</option></select>
+          <select class="fsel" id="f-fee" onchange="filterDocs()"><option value="">Any fee</option><option value="10000">Under ₦10k</option><option value="15000">Under ₦15k</option><option value="20000">Under ₦20k</option></select>
+          <select class="fsel" id="f-sort" onchange="filterDocs()"><option value="">Sort: Default</option><option value="rating">Highest rated</option><option value="dist">Nearest</option><option value="fee">Lowest fee</option></select>
+          <div class="ftog" id="ft-ins" onclick="toggleInsF(this)">Insurance only</div>
+        </div>
+        <div class="doc-list" id="doc-list"></div>
+        <div class="no-res" id="no-res">No doctors match your filters.</div>
+      </div>
+
+      <!-- S4: Payment -->
+      <div class="screen" id="s4">
+        <div id="pay-view">
+          <div class="sec-title">Payment</div>
+          <div class="pay-card" id="pay-summary"></div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:8px">Payment method</div>
+          <div class="pay-methods">
+            <div class="pm on" id="pm-card" onclick="selPM('card')"><div class="pm-icon">💳</div>Card</div>
+            <div class="pm" id="pm-transfer" onclick="selPM('transfer')"><div class="pm-icon">🏦</div>Bank transfer</div>
+            <div class="pm" id="pm-ussd" onclick="selPM('ussd')"><div class="pm-icon">📱</div>USSD</div>
+            <div class="pm" id="pm-wallet" onclick="selPM('wallet')"><div class="pm-icon">👜</div>Wallet</div>
+          </div>
+          <div class="pay-input-area show" id="pm-card-input">
+            <div class="row2"><div class="field"><label>Card number</label><input type="text" placeholder="•••• •••• •••• ••••"/></div><div class="field"><label>Expiry</label><input type="text" placeholder="MM/YY"/></div></div>
+            <div class="row2"><div class="field"><label>Cardholder name</label><input type="text" placeholder="As on card"/></div><div class="field"><label>CVV</label><input type="text" placeholder="•••"/></div></div>
+          </div>
+          <div class="pay-input-area" id="pm-transfer-input"><div class="bank-detail"><div class="pay-row"><span class="lbl">Bank</span><span>GTBank</span></div><div class="pay-row"><span class="lbl">Account</span><span>0123456789</span></div><div class="pay-row"><span class="lbl">Reference</span><span style="color:var(--blue);font-weight:700">MB-2026-00412</span></div></div></div>
+          <div class="pay-input-area" id="pm-ussd-input"><div class="ussd-code">*737*000*<span id="ussd-amt">0</span>#<br><span style="font-size:12px;font-weight:400;color:var(--text2)">Dial on your GTBank line</span></div></div>
+          <div class="pay-input-area" id="pm-wallet-input"><div class="bank-detail"><div class="pay-row"><span class="lbl">Wallet balance</span><span style="color:var(--teal-dark);font-weight:700">₦24,500</span></div></div></div>
+          <button class="btn btn-primary" style="width:100%;margin-top:12px;padding:10px" onclick="processPayment()">Pay now</button>
+        </div>
+        <div class="success-screen" id="pay-success" style="display:none">
+          <div class="suc-icon">✓</div>
+          <div style="font-size:18px;font-weight:700;margin-bottom:6px">Booking confirmed!</div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.6;max-width:300px;margin:0 auto 12px">Payment received. Your appointment is confirmed and the doctor has been notified.</div>
+          <div class="notif"><div class="ndot"></div><div><div class="ntext">Payment confirmed. Appointment with Dr. Adeyemi — Mar 15 at 9:00 AM.</div><div class="ntime">Just now</div></div></div>
+          <div class="notif"><div class="ndot read"></div><div><div class="ntext">Prescription from Dr. Nwosu sent to Healthplus Pharmacy, Lekki.</div><div class="ntime">4 days ago</div></div></div>
+          <div class="review-form">
+            <div style="font-size:13px;font-weight:700;margin-bottom:3px">Rate your last visit</div>
+            <div style="font-size:12px;color:var(--text2);margin-bottom:7px">Dr. Emeka Adeyemi · Mar 10</div>
+            <label>Overall rating</label>
+            <div class="star-input" id="star-input"><span onclick="setStars(1)">★</span><span onclick="setStars(2)">★</span><span onclick="setStars(3)">★</span><span onclick="setStars(4)">★</span><span onclick="setStars(5)">★</span></div>
+            <label>What stood out?</label>
+            <div class="review-cats"><div class="rcat" onclick="this.classList.toggle('on')">Punctual</div><div class="rcat" onclick="this.classList.toggle('on')">Clear explanation</div><div class="rcat" onclick="this.classList.toggle('on')">Thorough</div><div class="rcat" onclick="this.classList.toggle('on')">Friendly</div><div class="rcat" onclick="this.classList.toggle('on')">Good follow-up</div></div>
+            <div class="field" style="margin-top:8px"><label>Write a review (optional)</label><textarea rows="2" id="review-text" placeholder="Share your experience..."></textarea></div>
+            <button class="btn btn-primary" style="font-size:12px;padding:7px 14px" onclick="submitReview()">Submit review</button>
+            <div class="review-sent" id="review-sent">✓ Thank you! Your review has been published.</div>
+          </div>
+          <button class="btn btn-primary" style="margin-top:14px;padding:9px 20px" onclick="goMsgs()">Go to messages →</button>
+        </div>
+      </div>
+
+      <!-- S5: Messages -->
+      <div class="screen" id="s5">
+        <div class="sec-title" style="margin-bottom:10px">Messages</div>
+        <div class="chat-wrap">
+          <div class="csidebar"><div class="csidebar-hdr">Conversations</div><div class="clist">
+            <div class="citem active" onclick="openChat(this,'Dr. Emeka Adeyemi','EA','Cardiologist','pat')"><div class="citem-name">Dr. Adeyemi <span class="udot"></span></div><div class="citem-prev">See you at 9am!</div><div class="citem-time">2h ago</div></div>
+            <div class="citem" onclick="openChat(this,'Dr. Chisom Okafor','CO','Dermatologist','pat')"><div class="citem-name">Dr. Okafor</div><div class="citem-prev">Apply twice daily</div><div class="citem-time">Mar 10</div></div>
+            <div class="citem" onclick="openChat(this,'Dr. Ngozi Nwosu','NN','Neurologist','pat')"><div class="citem-name">Dr. Nwosu</div><div class="citem-prev">Rx sent to pharmacy</div><div class="citem-time">Mar 8</div></div>
+          </div></div>
+          <div class="cmain">
+            <div class="chdr"><div class="chdr-av" id="p-cav">EA</div><div><div class="chdr-name" id="p-cname">Dr. Emeka Adeyemi</div><div class="chdr-sub" id="p-csub">Cardiologist</div></div></div>
+            <div class="cmsgs" id="p-cmsgs">
+              <div class="msg them"><div class="mbub">Hello! I've reviewed your symptoms. Please avoid strenuous activity until we meet.</div><div class="mtime">Yesterday 3:12 PM</div></div>
+              <div class="msg me"><div class="mbub">Thank you doctor. Any medication before the appointment?</div><div class="mtime">Yesterday 3:45 PM</div></div>
+              <div class="msg them"><div class="mbub">Just continue current medication. See you at 9am tomorrow!</div><div class="mtime">Yesterday 4:01 PM</div></div>
+            </div>
+            <div class="cinput-area"><input class="cinput" id="p-cinput" placeholder="Type a message..." onkeydown="if(event.key==='Enter')sendMsg('p')"/><button class="sbtn" onclick="sendMsg('p')">➤</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="wfoot">
+      <button class="btn btn-ghost" id="btn-back" onclick="wizStep(-1)" style="display:none">← Back</button>
+      <div style="font-size:11px;color:var(--text2)" id="step-ind">Step 1 of 5</div>
+      <button class="btn btn-primary" id="btn-next" onclick="wizStep(1)">Next →</button>
+    </div>
+  </div>
+
+  <!-- ══ DOCTOR ══ -->
+  <div class="dp" id="mode-doctor" style="display:none">
+    <div class="dptabs">
+      <div class="dptab active" onclick="dpTab('dash',this)">Dashboard</div>
+      <div class="dptab" onclick="dpTab('inbox',this)">Inbox <span style="background:var(--amber-light);color:var(--amber);font-size:10px;padding:1px 5px;border-radius:99px;margin-left:2px;font-weight:700">3</span></div>
+      <div class="dptab" onclick="dpTab('dmsg',this)">Messages</div>
+      <div class="dptab" onclick="dpTab('rx',this)">Prescriptions</div>
+      <div class="dptab" onclick="dpTab('reviews',this)">My reviews</div>
+      <div class="dptab" onclick="dpTab('profile',this)">Profile</div>
+    </div>
+    <div class="dpbody">
+      <div class="dpsec active" id="dp-dash">
+        <div class="stats-row"><div class="sbox"><div class="snum">3</div><div class="slbl">Pending</div></div><div class="sbox"><div class="snum">5</div><div class="slbl">Confirmed</div></div><div class="sbox"><div class="snum">2</div><div class="slbl">Home visits</div></div><div class="sbox"><div class="snum" style="color:var(--amber)">4.9</div><div class="slbl">Avg rating</div></div></div>
+        <div class="sec-title">Today — Mar 14</div>
+        <div class="hi"><div class="hdate">9:00 AM</div><div><div class="htitle">Chukwuemeka Bello <span class="badge bo">Office</span></div><div class="hsub">Cardiology · Chest pain & shortness of breath</div></div></div>
+        <div class="hi"><div class="hdate">11:00 AM</div><div><div class="htitle">Adaeze Nwosu <span class="badge bh">Home</span></div><div class="hsub">Dermatology · Recurring skin rash</div></div></div>
+        <div class="hi"><div class="hdate">2:00 PM</div><div><div class="htitle">Fatima Al-Hassan <span class="badge bo">Office</span></div><div class="hsub">Endocrinology · Diabetes management</div></div></div>
+      </div>
+      <div class="dpsec" id="dp-inbox">
+        <div class="sec-title">Incoming requests</div>
+        <div class="ic"><div class="itop"><div><div class="iname">Chukwuemeka Bello</div><div class="imeta">Cardiology · Mar 15, 9:00 AM · 🏢 Office · Hygeia HMO<br>Chest pain and shortness of breath for 3 days</div></div><span class="pill pp-p">Pending</span></div><div class="iactions"><button class="bci" onclick="iAct(this,'confirm')">✓ Confirm</button><button onclick="iAct(this,'home')">🏠 Home</button><button onclick="iAct(this,'office')">🏢 Office</button><button class="bdc" onclick="iAct(this,'decline')">✕ Decline</button></div></div>
+        <div class="ic"><div class="itop"><div><div class="iname">Adaeze Nwosu</div><div class="imeta">Dermatology · Mar 15, 10:00 AM · 🏠 Home · AXA Mansard<br>Recurring skin rash on arms and neck</div></div><span class="pill pp-p">Pending</span></div><div class="iactions"><button class="bci" onclick="iAct(this,'confirm')">✓ Confirm</button><button onclick="iAct(this,'home')">🏠 Home</button><button onclick="iAct(this,'office')">🏢 Office</button><button class="bdc" onclick="iAct(this,'decline')">✕ Decline</button></div></div>
+        <div class="ic"><div class="itop"><div><div class="iname">Fatima Al-Hassan</div><div class="imeta">Endocrinology · Mar 16, 12:00 PM · 🏢 Office · NHIS<br>Uncontrolled diabetes, weight fluctuation</div></div><span class="pill pp-p">Pending</span></div><div class="iactions"><button class="bci" onclick="iAct(this,'confirm')">✓ Confirm</button><button onclick="iAct(this,'home')">🏠 Home</button><button onclick="iAct(this,'office')">🏢 Office</button><button class="bdc" onclick="iAct(this,'decline')">✕ Decline</button></div></div>
+      </div>
+      <div class="dpsec" id="dp-dmsg">
+        <div class="sec-title" style="margin-bottom:10px">Messages</div>
+        <div class="chat-wrap">
+          <div class="csidebar"><div class="csidebar-hdr">Patients</div><div class="clist">
+            <div class="citem active" onclick="openChat(this,'Chukwuemeka Bello','CB','Cardiology','dr')"><div class="citem-name">Chukwuemeka <span class="udot"></span></div><div class="citem-prev">Thank you doctor</div><div class="citem-time">2h ago</div></div>
+            <div class="citem" onclick="openChat(this,'Adaeze Nwosu','AN','Dermatology','dr')"><div class="citem-name">Adaeze Nwosu</div><div class="citem-prev">Apply twice daily</div><div class="citem-time">Mar 10</div></div>
+            <div class="citem" onclick="openChat(this,'Fatima Al-Hassan','FA','Endocrinology','dr')"><div class="citem-name">Fatima Al-Hassan</div><div class="citem-prev">Rx confirmed</div><div class="citem-time">Mar 8</div></div>
+          </div></div>
+          <div class="cmain">
+            <div class="chdr"><div class="chdr-av" id="d-cav">CB</div><div><div class="chdr-name" id="d-cname">Chukwuemeka Bello</div><div class="chdr-sub" id="d-csub">Cardiology</div></div></div>
+            <div class="cmsgs" id="d-cmsgs">
+              <div class="msg them"><div class="mbub">Doctor, should I stop Aspirin before my visit?</div><div class="mtime">Today 7:30 AM</div></div>
+              <div class="msg me"><div class="mbub">Continue Aspirin as normal. See you at 9am!</div><div class="mtime">Today 8:15 AM</div></div>
+              <div class="msg them"><div class="mbub">Thank you doctor, I'll be there.</div><div class="mtime">Today 8:22 AM</div></div>
+            </div>
+            <div class="cinput-area"><input class="cinput" id="d-cinput" placeholder="Message patient..." onkeydown="if(event.key==='Enter')sendMsg('d')"/><button class="sbtn" onclick="sendMsg('d')">➤</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="dpsec" id="dp-rx">
+        <div class="sec-title">Prescriptions</div>
+        <div class="rx-card"><div class="rx-hdr"><div><div class="rx-pat">Chukwuemeka Bello</div><div class="rx-meta">Mar 10 · Cardiology</div></div><span class="rxst sent">Sent to pharmacy</span></div><div class="rx-drugs"><div class="rx-drug">Aspirin 75mg — Once daily after food</div><div class="rx-drug">Lisinopril 5mg — Once daily morning</div></div><div class="rx-pharm">📍 Healthplus Pharmacy, Lekki Phase 1 · ★ 4.8</div></div>
+        <div class="add-rx">
+          <div class="sec-title" style="margin-bottom:9px">New prescription</div>
+          <div class="field"><label>Patient</label><select><option>Chukwuemeka Bello</option><option>Adaeze Nwosu</option><option>Fatima Al-Hassan</option></select></div>
+          <div class="field"><label>Medications</label><div id="drug-rows"><div class="drug-row"><input type="text" placeholder="Drug name e.g. Amoxicillin 500mg"/><input class="dos" type="text" placeholder="Dosage"/><button class="rmv" onclick="rmvDrug(this)">×</button></div></div><button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;margin-top:5px" onclick="addDrug()">+ Add drug</button></div>
+          <div class="field"><label>Send to pharmacy</label><select><option>Healthplus Pharmacy, Lekki ★ 4.8</option><option>MedPlus Pharmacy, VI ★ 4.6</option><option>Glover Court Pharmacy, Ikoyi ★ 4.7</option><option>Alpha Pharmacy, Surulere ★ 4.4</option></select></div>
+          <div class="field"><label>Notes to pharmacist</label><input type="text" placeholder="e.g. Check for drug interactions"/></div>
+          <button class="btn btn-primary" onclick="sendRx()">Send to pharmacy</button><span id="rx-sent" style="font-size:12px;color:var(--teal-dark);font-weight:700;margin-left:9px;display:none">✓ Sent!</span>
+        </div>
+      </div>
+      <div class="dpsec" id="dp-reviews">
+        <div class="dr-review-summary">
+          <div class="dr-big-score"><div class="dr-big-num">4.9</div><div class="dr-big-stars">★★★★★</div><div class="dr-big-count">47 reviews</div></div>
+          <div class="dr-bars">
+            <div class="dr-bar-row"><div class="dr-bar-lbl">5</div><div class="dr-bar-track"><div class="dr-bar-fill" style="width:87%"></div></div><div class="dr-bar-n">41</div></div>
+            <div class="dr-bar-row"><div class="dr-bar-lbl">4</div><div class="dr-bar-track"><div class="dr-bar-fill" style="width:10%"></div></div><div class="dr-bar-n">5</div></div>
+            <div class="dr-bar-row"><div class="dr-bar-lbl">3</div><div class="dr-bar-track"><div class="dr-bar-fill" style="width:2%"></div></div><div class="dr-bar-n">1</div></div>
+            <div class="dr-bar-row"><div class="dr-bar-lbl">2</div><div class="dr-bar-track"><div class="dr-bar-fill" style="width:0%"></div></div><div class="dr-bar-n">0</div></div>
+            <div class="dr-bar-row"><div class="dr-bar-lbl">1</div><div class="dr-bar-track"><div class="dr-bar-fill" style="width:0%"></div></div><div class="dr-bar-n">0</div></div>
+          </div>
+        </div>
+        <div class="sec-title">Recent reviews</div>
+        <div class="dr-review-card"><div class="drv-top"><div class="drv-name">Taiwo O.</div><div class="drv-date">Mar 10</div></div><div class="drv-stars">★★★★★</div><div class="drv-text">Excellent doctor. Very thorough and explained everything clearly.</div><div class="drv-tags"><span class="dvtag">Thorough</span><span class="dvtag">Clear explanation</span><span class="dvtag">Friendly</span></div></div>
+        <div class="dr-review-card"><div class="drv-top"><div class="drv-name">Fatima A.</div><div class="drv-date">Mar 5</div></div><div class="drv-stars">★★★★★</div><div class="drv-text">Home visit was seamless. Very professional and followed up the next day.</div><div class="drv-tags"><span class="dvtag">Punctual</span><span class="dvtag">Good follow-up</span></div></div>
+        <div class="dr-review-card"><div class="drv-top"><div class="drv-name">Emeka B.</div><div class="drv-date">Feb 20</div></div><div class="drv-stars">★★★★☆</div><div class="drv-text">Good consultation. Slight wait time but excellent quality of care.</div><div class="drv-tags"><span class="dvtag">Clear explanation</span><span class="dvtag">Friendly</span></div></div>
+      </div>
+      <div class="dpsec" id="dp-profile">
+        <div class="sec-title">My profile</div>
+        <div class="row2"><div class="field"><label>First name</label><input value="Emeka"/></div><div class="field"><label>Last name</label><input value="Adeyemi"/></div></div>
+        <div class="row2"><div class="field"><label>Phone</label><input value="+234 803 000 0001"/></div><div class="field"><label>Email</label><input value="e.adeyemi@medbook.ng"/></div></div>
+        <div class="field"><label>Specialty</label><select><option>Cardiologist</option><option>Dermatologist</option><option>Neurologist</option><option>General Practitioner</option><option>Endocrinologist</option></select></div>
+        <div class="field"><label>Bio</label><textarea rows="2">Board-certified cardiologist with 12 years of clinical experience.</textarea></div>
+        <div class="field"><label>Office address</label><input value="24 Marina St, Lagos Island"/></div>
+        <div class="field"><label>Consultation fee (₦)</label><input type="number" value="15000"/></div>
+
+        <!-- REGISTRATION / CREDENTIALS -->
+        <div class="reg-box">
+          <div class="reg-box-title">Professional registration & credentials</div>
+          <div class="field"><label>Registration type</label>
+            <div class="id-type-row">
+              <div class="id-type-btn on" id="reg-mdcn" onclick="setRegType('mdcn',this)">MDCN Number</div>
+              <div class="id-type-btn" id="reg-council" onclick="setRegType('council',this)">Specialty Council</div>
+              <div class="id-type-btn" id="reg-govt" onclick="setRegType('govt',this)">Govt Licence</div>
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field"><label id="reg-id-label">MDCN Registration number</label><input type="text" id="reg-id-input" placeholder="e.g. MDCN/R/12345"/></div>
+            <div class="field"><label>Year of registration</label><input type="text" placeholder="e.g. 2012"/></div>
+          </div>
+          <div class="field"><label>Issuing body / council</label><input type="text" placeholder="e.g. Medical & Dental Council of Nigeria"/></div>
+          <div class="field"><label>Upload credentials (in real app — PDF/image)</label><input type="text" placeholder="Credential file name or reference number"/></div>
+          <button class="btn btn-primary" style="font-size:12px;padding:6px 13px" onclick="verifyReg()">Verify registration</button>
+          <div class="reg-verified" id="reg-verified">✓ Registration verified — your profile is eligible for listing</div>
+        </div>
+
+        <div class="field"><label>Accepted insurance</label><select multiple style="height:68px"><option selected>Hygeia HMO</option><option selected>AXA Mansard</option><option selected>NHIS</option><option>Reliance HMO</option></select></div>
+        <div class="field"><label>Availability</label><div class="avail-grid"><div class="aslot on" onclick="this.classList.toggle('on')">8:00 AM</div><div class="aslot on" onclick="this.classList.toggle('on')">9:00 AM</div><div class="aslot on" onclick="this.classList.toggle('on')">10:00 AM</div><div class="aslot" onclick="this.classList.toggle('on')">11:00 AM</div><div class="aslot on" onclick="this.classList.toggle('on')">12:00 PM</div><div class="aslot on" onclick="this.classList.toggle('on')">2:00 PM</div></div></div>
+        <div class="field"><label>Visit types offered</label><div class="avtype-row"><div class="avtype on" onclick="this.classList.toggle('on')">🏠 Home</div><div class="avtype on" onclick="this.classList.toggle('on')">🏢 Office</div></div></div>
+        <button class="btn btn-primary" onclick="saveP()">Save profile</button><span id="p-saved" style="font-size:12px;color:var(--teal-dark);font-weight:700;margin-left:9px;display:none">✓ Saved!</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PHARMACY ══ -->
+  <div class="pp-panel" id="mode-pharmacy" style="display:none">
+    <div class="pp-tabs">
+      <div class="pp-tab active" onclick="ppTab('queue',this)">Rx Queue <span style="background:var(--amber-light);color:var(--amber);font-size:10px;padding:1px 5px;border-radius:99px;margin-left:2px;font-weight:700">3</span></div>
+      <div class="pp-tab" onclick="ppTab('pmsg',this)">Messages</div>
+      <div class="pp-tab" onclick="ppTab('ratings',this)">Our ratings</div>
+      <div class="pp-tab" onclick="ppTab('phist',this)">History</div>
+      <div class="pp-tab" onclick="ppTab('pprofile',this)">Profile</div>
+    </div>
+    <div class="pp-body">
+
+      <!-- RX QUEUE -->
+      <div class="pp-sec active" id="pp-queue">
+        <div class="pp-stats"><div class="sbox"><div class="snum">3</div><div class="slbl">Pending Rx</div></div><div class="sbox"><div class="snum">12</div><div class="slbl">Fulfilled today</div></div><div class="sbox"><div class="snum" style="color:#EF9F27">4.8</div><div class="slbl">Our rating</div></div></div>
+        <div class="sec-title">Incoming prescriptions</div>
+
+        <div class="rxq" id="rxq1">
+          <div class="rxqt"><div><div class="rxqp">Chukwuemeka Bello</div><div class="rxqm">Dr. Adeyemi · Cardiology · Received just now</div></div><span class="pill pp-p">Pending</span></div>
+          <div class="rxqd">
+            <div class="rxqdr"><span>Aspirin 75mg — Once daily after food</span></div>
+            <div class="rxqdr"><span>Lisinopril 5mg — Once daily morning</span></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Availability status</div>
+          <div class="avail-status-row">
+            <div class="avail-status-btn avs-all" onclick="selAvail(this,'rxq1','all')">✓ All available</div>
+            <div class="avail-status-btn avs-partial" onclick="selAvail(this,'rxq1','partial')">⚡ Partial</div>
+            <div class="avail-status-btn avs-none" onclick="selAvail(this,'rxq1','none')">✕ None available</div>
+          </div>
+          <div class="rx-confirm-fields" id="rxq1-fields">
+            <div class="row2">
+              <div class="field"><label>Total cost (₦)</label><input type="number" placeholder="e.g. 4500"/></div>
+              <div class="field"><label>Ready for pickup in</label><select><option>30 minutes</option><option>1 hour</option><option>2 hours</option><option>Tomorrow morning</option></select></div>
+            </div>
+            <div class="field"><label>Notes to patient (optional)</label><input type="text" placeholder="e.g. Lisinopril substituted with equivalent brand"/></div>
+            <button class="rxq-confirm-btn" onclick="confirmRxq('rxq1')">Confirm & notify patient</button>
+          </div>
+          <div class="rxq-done" id="rxq1-done">✓ Patient notified — awaiting pickup</div>
+        </div>
+
+        <div class="rxq" id="rxq2">
+          <div class="rxqt"><div><div class="rxqp">Fatima Al-Hassan</div><div class="rxqm">Dr. Adeyemi · Endocrinology · 2h ago</div></div><span class="pill pp-p">Pending</span></div>
+          <div class="rxqd">
+            <div class="rxqdr"><span>Metformin 500mg — Twice daily with meals</span></div>
+            <div class="rxqdr"><span>Glibenclamide 5mg — Once daily before breakfast</span></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Availability status</div>
+          <div class="avail-status-row">
+            <div class="avail-status-btn avs-all" onclick="selAvail(this,'rxq2','all')">✓ All available</div>
+            <div class="avail-status-btn avs-partial" onclick="selAvail(this,'rxq2','partial')">⚡ Partial</div>
+            <div class="avail-status-btn avs-none" onclick="selAvail(this,'rxq2','none')">✕ None available</div>
+          </div>
+          <div class="rx-confirm-fields" id="rxq2-fields">
+            <div class="row2"><div class="field"><label>Total cost (₦)</label><input type="number" placeholder="e.g. 3200"/></div><div class="field"><label>Ready for pickup in</label><select><option>30 minutes</option><option>1 hour</option><option>2 hours</option><option>Tomorrow morning</option></select></div></div>
+            <div class="field"><label>Notes to patient</label><input type="text" placeholder="e.g. Glibenclamide 5mg currently low — substituting 2.5mg x2"/></div>
+            <button class="rxq-confirm-btn" onclick="confirmRxq('rxq2')">Confirm & notify patient</button>
+          </div>
+          <div class="rxq-done" id="rxq2-done">✓ Patient notified — awaiting pickup</div>
+        </div>
+
+        <div class="rxq" id="rxq3">
+          <div class="rxqt"><div><div class="rxqp">Taiwo Ogundimu</div><div class="rxqm">Dr. Nwosu · Neurology · 3h ago</div></div><span class="pill pp-p">Pending</span></div>
+          <div class="rxqd">
+            <div class="rxqdr"><span>Sumatriptan 50mg — As needed for migraine</span></div>
+            <div class="rxqdr"><span>Topiramate 25mg — Once daily at bedtime</span></div>
+          </div>
+          <div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">Availability status</div>
+          <div class="avail-status-row">
+            <div class="avail-status-btn avs-all" onclick="selAvail(this,'rxq3','all')">✓ All available</div>
+            <div class="avail-status-btn avs-partial" onclick="selAvail(this,'rxq3','partial')">⚡ Partial</div>
+            <div class="avail-status-btn avs-none" onclick="selAvail(this,'rxq3','none')">✕ None available</div>
+          </div>
+          <div class="rx-confirm-fields" id="rxq3-fields">
+            <div class="row2"><div class="field"><label>Total cost (₦)</label><input type="number" placeholder="e.g. 6800"/></div><div class="field"><label>Ready for pickup in</label><select><option>30 minutes</option><option>1 hour</option><option>2 hours</option><option>Tomorrow morning</option></select></div></div>
+            <div class="field"><label>Notes to patient</label><input type="text" placeholder="e.g. Sumatriptan out of stock — please contact doctor for alternative"/></div>
+            <button class="rxq-confirm-btn" onclick="confirmRxq('rxq3')">Confirm & notify patient</button>
+          </div>
+          <div class="rxq-done" id="rxq3-done">✓ Patient notified — awaiting pickup</div>
+        </div>
+      </div>
+
+      <!-- MESSAGES -->
+      <div class="pp-sec" id="pp-pmsg">
+        <div class="sec-title" style="margin-bottom:10px">Messages with doctors</div>
+        <div class="chat-wrap">
+          <div class="csidebar"><div class="csidebar-hdr">Doctors</div><div class="clist">
+            <div class="citem active" onclick="openChat(this,'Dr. Emeka Adeyemi','EA','Cardiologist','ph')"><div class="citem-name">Dr. Adeyemi <span class="udot"></span></div><div class="citem-prev">Noted, will substitute</div><div class="citem-time">1h ago</div></div>
+            <div class="citem" onclick="openChat(this,'Dr. Ngozi Nwosu','NN','Neurologist','ph')"><div class="citem-name">Dr. Nwosu</div><div class="citem-prev">Out of stock alert</div><div class="citem-time">3h ago</div></div>
+          </div></div>
+          <div class="cmain">
+            <div class="chdr"><div class="chdr-av" id="ph-cav">EA</div><div><div class="chdr-name" id="ph-cname">Dr. Emeka Adeyemi</div><div class="chdr-sub" id="ph-csub">Cardiologist</div></div></div>
+            <div class="cmsgs" id="ph-cmsgs">
+              <div class="msg me"><div class="mbub">Glibenclamide 5mg running low (3 units). Substitute with 2.5mg x2?</div><div class="mtime">1h ago</div></div>
+              <div class="msg them"><div class="mbub">Yes fine for Fatima. Please note it on her dispensing record.</div><div class="mtime">45 min ago</div></div>
+            </div>
+            <div class="cinput-area"><input class="cinput" id="ph-cinput" placeholder="Message doctor..." onkeydown="if(event.key==='Enter')sendMsg('ph')"/><button class="sbtn" onclick="sendMsg('ph')">➤</button></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PHARMACY RATINGS -->
+      <div class="pp-sec" id="pp-ratings">
+        <div class="dr-review-summary">
+          <div class="dr-big-score"><div class="dr-big-num" style="color:#EF9F27">4.8</div><div class="dr-big-stars">★★★★★</div><div class="dr-big-count">134 ratings</div></div>
+          <div class="dr-bars">
+            <div class="dr-bar-row"><div class="dr-bar-lbl">5</div><div class="dr-bar-track"><div class="dr-bar-fill" style="width:75%"></div></div><div class="dr-bar-n">101</div></div>
+            <div class="dr-bar-row"><div class="dr-bar-lbl">4</div><div class="dr-bar-track"><div class="dr-bar-fill" style="width:18%"></div></div><div class="dr-bar-n">24</div></div>
+            <div class="dr-bar-row"><div class="dr-bar-lbl">3</div><div class="dr-bar-track"><div class="dr-bar-fill" style="width:6%"></div></div><div class="dr-bar-n">8</div></div>
+            <div class="dr-bar-row"><div class="dr-bar-lbl">2</div><div class="dr-bar-track"><div class="dr-bar-fill" style="width:1%"></div></div><div class="dr-bar-n">1</div></div>
+            <div class="dr-bar-row"><div class="dr-bar-lbl">1</div><div class="dr-bar-track"><div class="dr-bar-fill" style="width:0%"></div></div><div class="dr-bar-n">0</div></div>
+          </div>
+        </div>
+        <div class="sec-title">Recent patient reviews</div>
+        <div class="dr-review-card"><div class="drv-top"><div class="drv-name">Chukwuemeka B.</div><div class="drv-date">Mar 10</div></div><div class="drv-stars">★★★★★</div><div class="drv-text">Very fast service. Prescription was ready in 20 minutes and staff were professional.</div><div class="drv-tags"><span class="dvtag">Fast service</span><span class="dvtag">Professional staff</span></div></div>
+        <div class="dr-review-card"><div class="drv-top"><div class="drv-name">Adaeze N.</div><div class="drv-date">Mar 8</div></div><div class="drv-stars">★★★★☆</div><div class="drv-text">Good pharmacy. One item was out of stock but they let me know immediately and suggested an alternative.</div><div class="drv-tags"><span class="dvtag">Good communication</span></div></div>
+        <div class="dr-review-card"><div class="drv-top"><div class="drv-name">Taiwo O.</div><div class="drv-date">Mar 5</div></div><div class="drv-stars">★★★★★</div><div class="drv-text">Excellent. Drugs were ready exactly when they said. Highly recommended.</div><div class="drv-tags"><span class="dvtag">Fast service</span><span class="dvtag">Accurate</span></div></div>
+      </div>
+
+      <!-- HISTORY -->
+      <div class="pp-sec" id="pp-phist">
+        <div class="sec-title">Dispensing history</div>
+        <div class="hi"><div class="hdate">Today</div><div><div class="htitle">Chukwuemeka Bello</div><div class="hsub">Aspirin 75mg × 30 · Lisinopril 5mg × 30 · Dr. Adeyemi · ₦4,500</div></div></div>
+        <div class="hi"><div class="hdate">Mar 10</div><div><div class="htitle">Adaeze Nwosu</div><div class="hsub">Hydrocortisone cream × 2 · Cetirizine 10mg × 14 · Dr. Okafor · ₦3,200</div></div></div>
+        <div class="hi"><div class="hdate">Mar 8</div><div><div class="htitle">Fatima Al-Hassan</div><div class="hsub">Metformin 500mg × 60 · Glibenclamide 5mg × 30 · Dr. Adeyemi · ₦5,800</div></div></div>
+      </div>
+
+      <!-- PHARMACY PROFILE -->
+      <div class="pp-sec" id="pp-pprofile">
+        <div class="sec-title">Pharmacy profile</div>
+        <div class="field"><label>Pharmacy name</label><input value="Healthplus Pharmacy"/></div>
+        <div class="field"><label>Address</label><input value="14 Admiralty Way, Lekki Phase 1, Lagos"/></div>
+        <div class="row2"><div class="field"><label>Phone</label><input value="+234 801 000 0001"/></div><div class="field"><label>Email</label><input value="lekki@healthplus.ng"/></div></div>
+        <div class="row2"><div class="field"><label>Opening hours</label><input value="8:00 AM – 9:00 PM"/></div><div class="field"><label>Weekend hours</label><input value="9:00 AM – 6:00 PM"/></div></div>
+        <div class="field"><label>PCN (Pharmacists Council of Nigeria) number</label><input value="PCN/2019/04521"/></div>
+        <div class="field"><label>CAC registration number</label><input value="RC 1234567"/></div>
+        <div class="pharm-reg-box">
+          <div class="pharm-reg-title">🏥 Join our pharmacy network</div>
+          <div class="pharm-reg-sub">Register to receive digital prescriptions from MedBook doctors and grow your customer base across Lagos and beyond.</div>
+          <button class="pharm-reg-btn" onclick="joinNetwork()">Request network membership</button>
+          <div id="network-joined" style="font-size:11px;color:var(--green);font-weight:700;margin-top:8px;display:none">✓ Request submitted — our team will review and contact you within 48 hours.</div>
+        </div>
+        <div style="margin-top:12px"></div>
+        <button class="btn btn-primary" onclick="savePP()">Save profile</button><span id="pp-saved" style="font-size:12px;color:var(--teal-dark);font-weight:700;margin-left:9px;display:none">✓ Saved!</span>
+      </div>
+
+    </div>
+  </div>
+
+  </div>
+</div>
+
+<div class="page-footer">MedBook prototype · Built with Claude · For demo and investor purposes only · Not a live medical product</div>
+
+<script>
+const AREA_GROUPS=[
+  {icon:'🧠',name:'Head & brain',tags:['Headache','Migraine','Dizziness','Memory loss','Confusion','Fainting','Seizures','Numbness / tingling','Neck stiffness']},
+  {icon:'👁️',name:'Eyes & vision',tags:['Blurred vision','Eye pain','Vision changes','Double vision','Dry eyes','Redness']},
+  {icon:'👂',name:'Ears, nose & throat',tags:['Hearing loss','Ear pain','Ringing in ears','Sore throat','Difficulty swallowing','Nosebleeds','Nasal congestion','Snoring','Loss of taste / smell']},
+  {icon:'❤️',name:'Heart & chest',tags:['Chest pain','Shortness of breath','Palpitations','Irregular heartbeat','Swollen legs','High blood pressure','Fatigue']},
+  {icon:'🫁',name:'Lungs & breathing',tags:['Cough','Persistent cough','Wheezing','Coughing blood','Sleep apnoea','Breathing difficulty']},
+  {icon:'🫃',name:'Stomach & gut',tags:['Abdominal pain','Nausea','Vomiting','Diarrhoea','Constipation','Bloating','Heartburn','Blood in stool','Loss of appetite','Jaundice']},
+  {icon:'🦴',name:'Muscles & joints',tags:['Joint pain','Back pain','Muscle weakness','Swollen joints','Difficulty walking','Stiffness','Fracture / injury']},
+  {icon:'🧴',name:'Skin & hair',tags:['Rash','Itching','Swelling','Skin discolouration','Unusual moles','Dry / flaky skin','Acne','Hair loss']},
+  {icon:'🫀',name:'Kidneys & urinary',tags:['Painful urination','Frequent urination','Blood in urine','Pelvic pain','Lower back pain']},
+  {icon:'🌸',name:'Reproductive health',tags:['Irregular periods','Pelvic pain','Discharge','Erectile dysfunction','Infertility','Pregnancy concerns']},
+  {icon:'🧬',name:'Hormones & metabolism',tags:['Unexplained weight loss','Weight gain','Night sweats','Chronic fatigue','Hair loss','Excessive thirst']},
+  {icon:'🧠',name:'Mental health',tags:['Anxiety','Depression','Insomnia','Mood swings','Panic attacks','Hallucinations','Suicidal thoughts']},
+  {icon:'🤒',name:'General & systemic',tags:['Fever','Swollen lymph nodes','Chronic fatigue','Loss of taste / smell','Night sweats','General unwellness']},
+];
+
+const SPEC_MAP={'Headache':['Neurologist','General Practitioner'],'Migraine':['Neurologist'],'Dizziness':['Neurologist','ENT (Ear, Nose & Throat)'],'Blurred vision':['Ophthalmologist','Neurologist'],'Memory loss':['Neurologist','Geriatrician'],'Confusion':['Neurologist','Psychiatrist'],'Fainting':['Cardiologist','Neurologist'],'Seizures':['Neurologist'],'Numbness / tingling':['Neurologist'],'Neck stiffness':['Neurologist','Orthopedic Surgeon'],'Eye pain':['Ophthalmologist'],'Vision changes':['Ophthalmologist','Neurologist'],'Double vision':['Ophthalmologist','Neurologist'],'Dry eyes':['Ophthalmologist'],'Redness':['Ophthalmologist','Dermatologist'],'Hearing loss':['ENT (Ear, Nose & Throat)'],'Ear pain':['ENT (Ear, Nose & Throat)'],'Ringing in ears':['ENT (Ear, Nose & Throat)'],'Sore throat':['ENT (Ear, Nose & Throat)','General Practitioner'],'Difficulty swallowing':['ENT (Ear, Nose & Throat)','Gastroenterologist'],'Nosebleeds':['ENT (Ear, Nose & Throat)'],'Nasal congestion':['ENT (Ear, Nose & Throat)','Allergist / Immunologist'],'Snoring':['ENT (Ear, Nose & Throat)'],'Loss of taste / smell':['ENT (Ear, Nose & Throat)','Neurologist'],'Chest pain':['Cardiologist','General Practitioner'],'Shortness of breath':['Pulmonologist','Cardiologist'],'Palpitations':['Cardiologist'],'Irregular heartbeat':['Cardiologist'],'Swollen legs':['Cardiologist','Vascular Surgeon'],'High blood pressure':['Cardiologist','General Practitioner'],'Fatigue':['General Practitioner','Endocrinologist'],'Cough':['Pulmonologist','General Practitioner'],'Persistent cough':['Pulmonologist'],'Wheezing':['Pulmonologist','Allergist / Immunologist'],'Coughing blood':['Pulmonologist','Oncologist'],'Sleep apnoea':['Pulmonologist','ENT (Ear, Nose & Throat)'],'Breathing difficulty':['Pulmonologist','Cardiologist'],'Abdominal pain':['Gastroenterologist','General Practitioner'],'Nausea':['Gastroenterologist','General Practitioner'],'Vomiting':['Gastroenterologist'],'Diarrhoea':['Gastroenterologist','Infectious Disease Specialist'],'Constipation':['Gastroenterologist'],'Bloating':['Gastroenterologist'],'Heartburn':['Gastroenterologist'],'Blood in stool':['Gastroenterologist','Oncologist'],'Loss of appetite':['General Practitioner','Gastroenterologist'],'Jaundice':['Hepatologist','Gastroenterologist'],'Joint pain':['Rheumatologist','Orthopedic Surgeon'],'Back pain':['Orthopedic Surgeon','Neurologist'],'Muscle weakness':['Neurologist','Rheumatologist'],'Swollen joints':['Rheumatologist'],'Difficulty walking':['Orthopedic Surgeon','Neurologist'],'Stiffness':['Rheumatologist','Orthopedic Surgeon'],'Fracture / injury':['Orthopedic Surgeon'],'Rash':['Dermatologist'],'Itching':['Dermatologist','Allergist / Immunologist'],'Swelling':['General Practitioner','Allergist / Immunologist'],'Skin discolouration':['Dermatologist'],'Unusual moles':['Dermatologist','Oncologist'],'Dry / flaky skin':['Dermatologist'],'Acne':['Dermatologist'],'Hair loss':['Dermatologist','Endocrinologist'],'Painful urination':['Urologist'],'Frequent urination':['Urologist','Endocrinologist'],'Blood in urine':['Urologist','Nephrologist'],'Lower back pain':['Orthopedic Surgeon','Nephrologist'],'Irregular periods':['Obstetrician / Gynecologist'],'Pelvic pain':['Obstetrician / Gynecologist','Urologist'],'Discharge':['Obstetrician / Gynecologist'],'Erectile dysfunction':['Urologist'],'Infertility':['Obstetrician / Gynecologist','Urologist'],'Pregnancy concerns':['Obstetrician / Gynecologist'],'Unexplained weight loss':['General Practitioner','Oncologist','Endocrinologist'],'Weight gain':['Endocrinologist','General Practitioner'],'Night sweats':['Infectious Disease Specialist','Oncologist'],'Chronic fatigue':['General Practitioner','Endocrinologist'],'Excessive thirst':['Endocrinologist'],'Anxiety':['Psychiatrist','Psychologist'],'Depression':['Psychiatrist','Psychologist'],'Insomnia':['Psychiatrist','General Practitioner'],'Mood swings':['Psychiatrist','Endocrinologist'],'Panic attacks':['Psychiatrist'],'Hallucinations':['Psychiatrist','Neurologist'],'Suicidal thoughts':['Psychiatrist'],'Fever':['General Practitioner','Infectious Disease Specialist'],'Swollen lymph nodes':['Oncologist','Infectious Disease Specialist'],'General unwellness':['General Practitioner']};
+const SPEC_REASONS={'Neurologist':'Brain, spinal cord and nervous system','Cardiologist':'Heart and cardiovascular conditions','General Practitioner':'First point of contact for most concerns','Dermatologist':'Skin, hair and nail conditions','Gastroenterologist':'Digestive system and gut conditions','Pulmonologist':'Lung and respiratory conditions','Orthopedic Surgeon':'Bones, joints and musculoskeletal','Rheumatologist':'Autoimmune and inflammatory joints','Ophthalmologist':'Eye conditions and vision problems','ENT (Ear, Nose & Throat)':'Ear, nose, throat and sinus','Endocrinologist':'Hormonal and metabolic conditions','Urologist':'Urinary tract and male reproductive','Obstetrician / Gynecologist':'Female reproductive health','Psychiatrist':'Mental health diagnosis and treatment','Psychologist':'Therapy and psychological assessment','Oncologist':'Cancer diagnosis and treatment','Infectious Disease Specialist':'Infections, viruses and tropical diseases','Nephrologist':'Kidney conditions','Hepatologist':'Liver and biliary conditions','Allergist / Immunologist':'Allergies and immune system disorders','Hematologist':'Blood disorders','Vascular Surgeon':'Blood vessel conditions','Geriatrician':'Healthcare for older adults','Sports Medicine':'Sports injuries and physical performance'};
+
+const DOCS=[
+  {name:'Dr. Emeka Adeyemi',spec:'Cardiologist',dist:1.2,avail:'Today',types:['home','office'],slots:['9:00 AM','11:00 AM','2:00 PM'],av:'av-t',init:'EA',fee:15000,ins:true,rating:4.9,rcount:47,bars:[87,10,2,0,0],reviews:[{name:'Taiwo O.',date:'Mar 10',stars:5,text:'Excellent doctor. Very thorough and explained everything clearly.',tags:['Thorough','Clear explanation','Friendly']},{name:'Fatima A.',date:'Mar 5',stars:5,text:'Home visit was seamless. Followed up the next day.',tags:['Punctual','Good follow-up']}]},
+  {name:'Dr. Chisom Okafor',spec:'Dermatologist',dist:2.4,avail:'Today',types:['office'],slots:['10:00 AM','3:00 PM','5:00 PM'],av:'av-b',init:'CO',fee:12000,ins:true,rating:4.7,rcount:31,bars:[74,19,7,0,0],reviews:[{name:'Adaeze N.',date:'Mar 8',stars:5,text:'Very knowledgeable. My skin condition improved significantly.',tags:['Thorough','Clear explanation']}]},
+  {name:'Dr. Ngozi Nwosu',spec:'Neurologist',dist:3.1,avail:'Tomorrow',types:['home','office'],slots:['8:00 AM','1:00 PM','4:00 PM'],av:'av-p',init:'NN',fee:18000,ins:false,rating:4.8,rcount:22,bars:[82,14,4,0,0],reviews:[{name:'Chidi O.',date:'Mar 1',stars:5,text:'Outstanding neurologist. Diagnosed my condition quickly.',tags:['Thorough','Clear explanation']}]},
+  {name:'Dr. Akin Fashola',spec:'Pulmonologist',dist:1.8,avail:'Today',types:['home'],slots:['10:00 AM','12:00 PM'],av:'av-t',init:'AF',fee:14000,ins:true,rating:4.6,rcount:18,bars:[67,22,11,0,0],reviews:[{name:'Kemi L.',date:'Feb 28',stars:5,text:'Great pulmonologist. My breathing issues are much better.',tags:['Thorough']}]},
+  {name:'Dr. Bola Adekunle',spec:'General Practitioner',dist:0.8,avail:'Today',types:['home','office'],slots:['9:00 AM','10:00 AM','2:00 PM','4:00 PM'],av:'av-b',init:'BA',fee:8000,ins:true,rating:4.5,rcount:63,bars:[60,25,12,2,1],reviews:[{name:'Tunde F.',date:'Mar 12',stars:5,text:'Very accessible. Great family doctor.',tags:['Punctual','Friendly']}]},
+  {name:'Dr. Seun Martins',spec:'Endocrinologist',dist:4.2,avail:'Tomorrow',types:['office'],slots:['9:00 AM','11:00 AM'],av:'av-p',init:'SM',fee:16000,ins:false,rating:4.7,rcount:15,bars:[73,20,7,0,0],reviews:[{name:'Ife O.',date:'Feb 10',stars:5,text:'Excellent. My diabetes is well controlled now.',tags:['Thorough','Good follow-up']}]},
+  {name:'Dr. Kemi Adeyinka',spec:'Cardiologist',dist:2.9,avail:'Today',types:['home','office'],slots:['10:00 AM','3:00 PM'],av:'av-p',init:'KA',fee:17000,ins:true,rating:4.6,rcount:28,bars:[68,21,11,0,0],reviews:[{name:'Dayo M.',date:'Mar 11',stars:5,text:'Excellent heart specialist. Very reassuring.',tags:['Thorough','Friendly']}]},
+];
+
+let step=1,selSpec='',selDoc=null,selSlot='',vtMode='home',insF=false,insActive=false,starRating=0,severity='',activeArea=null;
+let selectedTags=new Set();
+
+const chatData={
+  pat:{'Dr. Emeka Adeyemi':[{me:false,t:"Hello! I've reviewed your symptoms. Please avoid strenuous activity."},{me:true,t:"Thank you doctor. Any medication before the appointment?"},{me:false,t:"Just continue current medication. See you at 9am tomorrow!"}],'Dr. Chisom Okafor':[{me:false,t:"Your skin results came back. Apply cream twice daily."},{me:true,t:"How long should I continue?"}],'Dr. Ngozi Nwosu':[{me:false,t:"Prescription sent to the pharmacy."},{me:true,t:"Thank you so much!"}]},
+  dr:{'Chukwuemeka Bello':[{me:false,t:"Doctor, should I stop Aspirin before my visit?"},{me:true,t:"Continue Aspirin as normal. See you at 9am!"},{me:false,t:"Thank you doctor!"}],'Adaeze Nwosu':[{me:true,t:"Apply cream twice daily for 2 weeks."},{me:false,t:"Thank you!"}],'Fatima Al-Hassan':[{me:true,t:"Prescription sent to MedPlus Pharmacy."},{me:false,t:"Confirmed, thank you!"}]},
+  ph:{'Dr. Emeka Adeyemi':[{me:true,t:"Glibenclamide 5mg running low. Substitute 2.5mg x2?"},{me:false,t:"Yes fine for Fatima. Note it on dispensing record."}],'Dr. Ngozi Nwosu':[{me:true,t:"Sumatriptan 50mg out of stock. Substitute Naratriptan 2.5mg?"},{me:false,t:"Yes that works. Notify the patient."}]}
+};
+
+// ── LANDING ──
+function enterApp(role){
+  document.getElementById('app-landing').style.display='none';
+  document.getElementById('app-main').style.display='flex';
+  const pill=document.getElementById('role-pill');
+  pill.textContent=role==='patient'?'Patient':role==='doctor'?'Doctor':'Pharmacy';
+  pill.className='role-pill '+(role==='patient'?'rp-patient':role==='doctor'?'rp-doctor':'rp-pharmacy');
+  ['patient','doctor','pharmacy'].forEach(r=>document.getElementById('mode-'+r).style.display='none');
+  document.getElementById('mode-'+role).style.display='flex';
+}
+function goLanding(){document.getElementById('app-main').style.display='none';document.getElementById('app-landing').style.display='flex';}
+
+// ── AREA TILES ──
+(function(){
+  const el=document.getElementById('area-tiles');
+  AREA_GROUPS.forEach((g,i)=>{
+    const d=document.createElement('div');d.className='area-tile';d.dataset.idx=i;
+    d.innerHTML=`<div class="tile-icon">${g.icon}</div><div class="tile-name">${g.name}</div><div class="tile-count" id="tc-${i}"></div>`;
+    d.onclick=()=>openArea(i,d);
+    el.appendChild(d);
+  });
+})();
+
+function openArea(idx,tile){
+  activeArea=idx;
+  document.querySelectorAll('.area-tile').forEach(t=>t.classList.remove('active'));
+  tile.classList.add('active');
+  const g=AREA_GROUPS[idx];
+  document.getElementById('area-tags-title').textContent=g.icon+' '+g.name;
+  const list=document.getElementById('area-tags-list');
+  list.innerHTML=g.tags.map(t=>`<span class="tag${selectedTags.has(t)?' on':''}" onclick="toggleTag('${t.replace(/'/g,"\\'")}',this)">${t}</span>`).join('');
+  document.getElementById('area-tags-panel').classList.add('open');
+}
+
+function closeAreaPanel(){
+  document.getElementById('area-tags-panel').classList.remove('open');
+  document.querySelectorAll('.area-tile').forEach(t=>t.classList.remove('active'));
+  activeArea=null;
+}
+
+function toggleTag(tag,el){
+  if(selectedTags.has(tag)){selectedTags.delete(tag);el.classList.remove('on');}
+  else{selectedTags.add(tag);el.classList.add('on');}
+  renderSelTags();updateSuggestions();updateTileCounts();
+}
+
+function updateTileCounts(){
+  AREA_GROUPS.forEach((g,i)=>{
+    const count=g.tags.filter(t=>selectedTags.has(t)).length;
+    const el=document.getElementById('tc-'+i);
+    if(el){el.textContent=count>0?count+' selected':'';document.querySelectorAll('.area-tile')[i].classList.toggle('has-sel',count>0);}
+  });
+}
+
+function renderSelTags(){
+  const el=document.getElementById('sel-tags');
+  if(selectedTags.size===0){el.innerHTML='<span class="sel-empty">No symptoms selected yet — tap an area above</span>';return;}
+  el.innerHTML=[...selectedTags].map(t=>`<span class="sel-tag">${t}<button onclick="removeTag('${t.replace(/'/g,"\\'")}')">×</button></span>`).join('');
+}
+
+function removeTag(tag){
+  selectedTags.delete(tag);
+  document.querySelectorAll('.tag').forEach(el=>{if(el.textContent===tag)el.classList.remove('on');});
+  renderSelTags();updateSuggestions();updateTileCounts();
+}
+
+function setSev(s){
+  severity=s;
+  ['mild','mod','sev'].forEach(x=>{document.getElementById('sev-'+x).classList.remove('on-mild','on-mod','on-sev');});
+  document.getElementById('sev-'+s).classList.add('on-'+s);
+  updateSuggestions();
+}
+
+function updateSuggestions(){
+  const specSel=document.getElementById('specialty-select').value;
+  const hasTxt=document.getElementById('symp-text').value.trim().length>8;
+  const hasTags=selectedTags.size>0;
+  const content=document.getElementById('suggest-content');
+  if(!hasTxt&&!hasTags&&!specSel){content.innerHTML='<div class="empty-suggest">Select symptoms or describe them above — specialists will appear here automatically.</div>';return;}
+  const scores={};
+  selectedTags.forEach(tag=>{(SPEC_MAP[tag]||[]).forEach((sp,i)=>{scores[sp]=(scores[sp]||0)+(i===0?3:1);});});
+  if(!scores['General Practitioner'])scores['General Practitioner']=1;
+  const sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const urgent=severity==='sev';
+  let html=`<div class="spec-cards">${sorted.map(([sp],i)=>{
+    const isAlsoPref=specSel&&sp===specSel;
+    const badge=urgent&&i===0?`<span class="match-badge mb-u">Urgent match</span>`:i===0?`<span class="match-badge mb-p">Best match${isAlsoPref?' · Your preferred':''}</span>`:`<span class="match-badge mb-s">Also recommended${isAlsoPref?' · Your preferred':''}</span>`;
+    return`<div class="spec-card${i===0?' primary':''}" onclick="selectSpec(this,'${sp}')"><div class="spec-name">${sp}</div><div class="spec-reason">${SPEC_REASONS[sp]||'Relevant to your symptoms'}</div>${badge}</div>`;
+  }).join('')}</div>`;
+  const alreadyShown=sorted.some(([sp])=>sp===specSel);
+  if(specSel&&!alreadyShown){html+=`<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"><div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:6px">YOUR PREFERRED SPECIALIST</div><div class="spec-cards"><div class="spec-card selected" onclick="selectSpec(this,'${specSel}')"><div class="spec-name">${specSel}</div><div class="spec-reason">${SPEC_REASONS[specSel]||'Your selected specialty'}</div><span class="match-badge" style="background:var(--blue-light);color:var(--blue)">Your preferred</span></div></div><div style="font-size:11px;color:var(--text2);margin-top:6px">💡 Your symptoms suggest a different specialist above. You can still book your preferred specialty.</div></div>`;}
+  if(urgent){html+=`<div class="urgent-warn">🚨 You indicated severe symptoms — please seek urgent care or visit an emergency facility if necessary.</div>`;}
+  content.innerHTML=html;
+  if(sorted.length>0){selSpec=specSel&&!alreadyShown?specSel:sorted[0][0];}
+}
+
+function selectSpec(el,sp){document.querySelectorAll('.spec-card').forEach(c=>c.classList.remove('selected'));el.classList.add('selected');selSpec=sp;}
+function starsHTML(r,sz){let h='';for(let i=1;i<=5;i++){const f=r>=i?'full':r>=i-0.5?'half':'empty';h+=`<span class="star ${f}" style="font-size:${sz||13}px">${f==='empty'?'☆':'★'}</span>`;}return h;}
+function toggleIns(){insActive=!insActive;document.getElementById('ins-fields').classList.toggle('show',insActive);document.getElementById('ins-tog').textContent=insActive?'− Hide':'+ Add insurance';document.getElementById('ins-tog').classList.toggle('on',insActive);}
+function verifyIns(){if(document.getElementById('ins-prov').value&&document.getElementById('ins-num').value)document.getElementById('ins-ok').style.display='block';}
+function patType(t){['home','office','either'].forEach(x=>document.getElementById('pat-'+x).classList.toggle('on',x===t));}
+function buildRebookCards(){
+  const c=document.getElementById('rebook-cards');c.innerHTML='';
+  [{idx:0,last:'Mar 10'},{idx:2,last:'Mar 8'},{idx:1,last:'Feb 20'}].forEach(({idx,last})=>{
+    const d=DOCS[idx];const div=document.createElement('div');div.className='rebook-card';
+    div.innerHTML=`<div class="rebook-av ${d.av}">${d.init}</div><div class="rebook-name">${d.name}</div><div class="rebook-spec">${d.spec}</div><div class="rebook-rating">${starsHTML(d.rating,11)} ${d.rating}</div><div style="font-size:10px;color:var(--text2);margin-top:2px">Last: ${last}</div><button class="rebook-btn" onclick="event.stopPropagation();rebookDoc(${idx})">Re-book →</button>`;
+    c.appendChild(div);
+  });
+}
+function setVT(t){vtMode=t;document.getElementById('vt-home').classList.toggle('on',t==='home');document.getElementById('vt-office').classList.toggle('on',t==='office');filterDocs();}
+function toggleInsF(el){insF=!insF;el.classList.toggle('on',insF);filterDocs();}
+function filterDocs(){
+  const avail=document.getElementById('f-avail').value;
+  const dist=parseFloat(document.getElementById('f-dist').value)||999;
+  const fee=parseFloat(document.getElementById('f-fee').value)||999999;
+  const sort=document.getElementById('f-sort').value;
+  let filtered=DOCS.filter(d=>{
+    if(!d.types.includes(vtMode))return false;
+    if(avail&&d.avail!==avail)return false;
+    if(d.dist>dist)return false;if(d.fee>fee)return false;
+    if(insF&&!d.ins)return false;if(selSpec&&d.spec!==selSpec)return false;
+    return true;
+  });
+  if(sort==='rating')filtered.sort((a,b)=>b.rating-a.rating);
+  else if(sort==='dist')filtered.sort((a,b)=>a.dist-b.dist);
+  else if(sort==='fee')filtered.sort((a,b)=>a.fee-b.fee);
+  const list=document.getElementById('doc-list');list.innerHTML='';
+  filtered.forEach(d=>{
+    const div=document.createElement('div');div.className='doc-card';
+    const tt=d.types.map(t=>t==='home'?'<span class="dtag t-h">🏠 Home</span>':'<span class="dtag t-o">🏢 Office</span>').join('');
+    const ib=d.ins?'<span class="dtag" style="background:var(--teal-light);color:var(--teal-dark);font-weight:600">✓ Ins</span>':'';
+    const sc=d.slots.map(s=>`<span class="schip" onclick="event.stopPropagation();pickSlot(this,'${s}',${DOCS.indexOf(d)})">${s}</span>`).join('');
+    const rp=d.reviews.slice(0,2).map(r=>`<div class="review-item"><div class="review-top"><span class="reviewer-name">${r.name}</span><span class="review-date">${r.date}</span></div><div class="review-stars">${starsHTML(r.stars,12)}</div><div class="review-text">${r.text}</div><div class="review-tags">${r.tags.map(t=>`<span class="rtag">${t}</span>`).join('')}</div></div>`).join('');
+    div.innerHTML=`<div class="doc-top"><div class="dav ${d.av}">${d.init}</div><div style="flex:1"><div class="dn">${d.name}</div><div class="ds">${d.spec}</div><div class="dmeta"><span class="dtag t-d">📍 ${d.dist}km</span><span class="dtag t-a">${d.avail}</span>${tt}${ib}<span style="font-size:11px;color:var(--text2)">₦${d.fee.toLocaleString()}</span></div><div class="star-row"><div class="stars">${starsHTML(d.rating)}</div><span class="rating-num">${d.rating}</span><span class="rating-count">(${d.rcount} reviews)</span></div><div class="rating-bars">${d.bars.map((b,j)=>`<div class="rbar-row"><div class="rbar-lbl">${5-j}</div><div class="rbar-track"><div class="rbar-fill" style="width:${b}%"></div></div></div>`).join('')}</div><button class="see-btn" onclick="event.stopPropagation();toggleReviews(this)">See ${d.rcount} reviews ▾</button><div class="reviews-panel">${rp}</div></div></div><div class="dslots">${sc}</div>`;
+    div.onclick=()=>{document.querySelectorAll('.doc-card').forEach(c=>c.classList.remove('selected'));div.classList.add('selected');selDoc=d;};
+    list.appendChild(div);
+  });
+  document.getElementById('no-res').style.display=filtered.length===0?'block':'none';
+}
+function toggleReviews(btn){const p=btn.nextElementSibling;const o=p.classList.toggle('open');btn.textContent=o?'Hide reviews ▴':`See ${btn.textContent.match(/\d+/)?.[0]||''} reviews ▾`;}
+function pickSlot(el,slot,idx){document.querySelectorAll('.schip').forEach(s=>s.classList.remove('picked'));el.classList.add('picked');selSlot=slot;selDoc=DOCS[idx];document.querySelectorAll('.doc-card').forEach(c=>c.classList.remove('selected'));el.closest('.doc-card').classList.add('selected');}
+function rebookDoc(idx){selDoc=DOCS[idx];selSlot=DOCS[idx].slots[0];alert(`Re-booking with ${DOCS[idx].name}.\nSelect a time slot from their card.`);}
+function buildPaySummary(){
+  const doc=selDoc||DOCS[0];const fee=doc.fee;
+  const insP=document.getElementById('ins-prov').value;const cov=insActive&&insP?Math.round(fee*0.8):0;const pay=fee-cov;
+  document.getElementById('ussd-amt').textContent=pay.toLocaleString();
+  document.getElementById('pay-summary').innerHTML=`<div class="pay-row"><span class="lbl">Doctor</span><span>${doc.name}</span></div><div class="pay-row"><span class="lbl">Specialty</span><span>${doc.spec}</span></div><div class="pay-row"><span class="lbl">Appointment</span><span>Mar 15, ${selSlot||'9:00 AM'} · ${vtMode==='home'?'🏠 Home':'🏢 Office'}</span></div><div class="pay-row"><span class="lbl">Consultation fee</span><span>₦${fee.toLocaleString()}</span></div>${cov>0?`<div class="pay-row ins-row"><span class="lbl">Insurance covers (80%)</span><span>− ₦${cov.toLocaleString()}</span></div>`:''}<div class="pay-row total"><span class="lbl">You pay</span><span>₦${pay.toLocaleString()}</span></div>`;
+}
+function selPM(m){['card','transfer','ussd','wallet'].forEach(x=>{document.getElementById('pm-'+x).classList.toggle('on',x===m);document.getElementById('pm-'+x+'-input').classList.toggle('show',x===m);});}
+function processPayment(){document.getElementById('pay-view').style.display='none';document.getElementById('pay-success').style.display='block';document.getElementById('btn-next').style.display='none';document.getElementById('btn-back').style.display='none';}
+function setStars(n){starRating=n;document.querySelectorAll('#star-input span').forEach((s,i)=>s.classList.toggle('lit',i<n));}
+function submitReview(){if(!starRating){alert('Please select a rating.');return;}document.getElementById('review-sent').style.display='block';document.querySelector('#star-input').style.pointerEvents='none';document.getElementById('review-text').disabled=true;document.querySelectorAll('.rcat').forEach(c=>c.style.pointerEvents='none');}
+function goMsgs(){step=5;document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s5').classList.add('active');['sp1','sp2','sp3','sp4','sp5'].forEach((id,i)=>{const el=document.getElementById(id);el.classList.remove('active','done');if(i<4)el.classList.add('done');else el.classList.add('active');});document.getElementById('btn-back').style.display='';document.getElementById('btn-next').style.display='none';document.getElementById('step-ind').textContent='Step 5 of 5';}
+function wizStep(dir){
+  if(dir===1&&step===1){const hasTxt=document.getElementById('symp-text').value.trim().length>5;const hasTags=selectedTags.size>0;if(!hasTxt&&!hasTags){alert('Please describe your symptoms or select at least one area.');return;}}
+  if(dir===1&&step===3&&!selDoc){alert('Please select a doctor and time slot.');return;}
+  const prev=step;step=Math.max(1,Math.min(5,step+dir));
+  document.getElementById('s'+prev).classList.remove('active');document.getElementById('s'+step).classList.add('active');
+  ['sp1','sp2','sp3','sp4','sp5'].forEach((id,i)=>{const el=document.getElementById(id);el.classList.remove('active','done');if(i+1===step)el.classList.add('active');else if(i+1<step)el.classList.add('done');});
+  document.getElementById('btn-back').style.display=step>1?'':'none';
+  document.getElementById('step-ind').textContent=`Step ${step} of 5`;
+  const nxt=document.getElementById('btn-next');
+  if(step===3){buildRebookCards();filterDocs();}
+  if(step===4){buildPaySummary();nxt.textContent='Proceed to payment →';nxt.onclick=()=>wizStep(1);}
+  else if(step===5){nxt.style.display='none';}
+  else{nxt.style.display='';nxt.textContent='Next →';nxt.onclick=()=>wizStep(1);}
+}
+function openChat(el,name,init,spec,mode){
+  const pfx=mode==='pat'?'p':mode==='dr'?'d':'ph';
+  el.closest('.csidebar').querySelectorAll('.citem').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');el.querySelector('.udot')&&el.querySelector('.udot').remove();
+  document.getElementById(pfx+'-cav').textContent=init;document.getElementById(pfx+'-cname').textContent=name;document.getElementById(pfx+'-csub').textContent=spec;
+  const msgs=document.getElementById(pfx+'-cmsgs');msgs.innerHTML='';
+  (chatData[mode][name]||[]).forEach(m=>{const d=document.createElement('div');d.className='msg '+(m.me?'me':'them');d.innerHTML=`<div class="mbub">${m.t}</div><div class="mtime">Earlier</div>`;msgs.appendChild(d);});
+  msgs.scrollTop=msgs.scrollHeight;
+}
+function sendMsg(mode){const pfx=mode==='pat'?'p':mode==='dr'?'d':'ph';const inp=document.getElementById(pfx+'-cinput');const txt=inp.value.trim();if(!txt)return;const msgs=document.getElementById(pfx+'-cmsgs');const d=document.createElement('div');d.className='msg me';d.innerHTML=`<div class="mbub">${txt}</div><div class="mtime">Just now</div>`;msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;inp.value='';}
+function iAct(btn,action){const card=btn.closest('.ic');const pill=card.querySelector('.pill');if(action==='confirm'){pill.className='pill pc';pill.textContent='Confirmed';card.querySelector('.bci')&&card.querySelector('.bci').remove();card.querySelector('.bdc')&&card.querySelector('.bdc').remove();}else if(action==='decline'){card.style.opacity='0.45';card.style.pointerEvents='none';pill.style.cssText='font-size:10px;padding:2px 8px;border-radius:99px;font-weight:600;background:#eee;color:#888';pill.textContent='Declined';}else{const m=card.querySelector('.imeta');m.innerHTML=m.innerHTML.replace(/🏢 Office|🏠 Home/,action==='home'?'🏠 Home':'🏢 Office');}}
+function dpTab(t,el){document.querySelectorAll('.dptab').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.querySelectorAll('.dpsec').forEach(s=>s.classList.remove('active'));document.getElementById('dp-'+t).classList.add('active');}
+function ppTab(t,el){document.querySelectorAll('.pp-tab').forEach(x=>x.classList.remove('active'));el.classList.add('active');document.querySelectorAll('.pp-sec').forEach(s=>s.classList.remove('active'));document.getElementById('pp-'+t).classList.add('active');}
+
+// Doctor registration
+function setRegType(type,el){
+  document.querySelectorAll('.id-type-btn').forEach(b=>b.classList.remove('on'));el.classList.add('on');
+  const labels={'mdcn':'MDCN Registration number','council':'Specialty Council registration number','govt':'Government professional licence number'};
+  const placeholders={'mdcn':'e.g. MDCN/R/12345','council':'e.g. NSC/2018/00456','govt':'e.g. FMH/LIC/2015/0789'};
+  document.getElementById('reg-id-label').textContent=labels[type];
+  document.getElementById('reg-id-input').placeholder=placeholders[type];
+}
+function verifyReg(){const v=document.getElementById('reg-verified');v.style.display='block';}
+
+// Pharmacy prescription flow
+function selAvail(btn,rxqId,type){
+  const container=btn.closest('.rxq');
+  container.querySelectorAll('.avail-status-btn').forEach(b=>{b.classList.remove('sel-all','sel-none','sel-partial');});
+  btn.classList.add('sel-'+type);
+  const fields=document.getElementById(rxqId+'-fields');
+  if(type==='none'){
+    fields.classList.add('show');
+    fields.querySelector('input[type=number]').disabled=true;
+    fields.querySelector('select').disabled=true;
+    fields.querySelector('input[type=number]').placeholder='N/A — no items available';
+  } else {
+    fields.classList.add('show');
+    fields.querySelector('input[type=number]').disabled=false;
+    fields.querySelector('select').disabled=false;
+    fields.querySelector('input[type=number]').placeholder=type==='all'?'e.g. 4500':'e.g. 2200 (partial)';
+  }
+}
+function confirmRxq(id){
+  document.getElementById(id+'-fields').classList.remove('show');
+  document.getElementById(id+'-done').style.display='block';
+  const card=document.getElementById(id);
+  const pill=card.querySelector('.pill');
+  pill.className='pill pc';pill.textContent='Confirmed';
+}
+function joinNetwork(){document.getElementById('network-joined').style.display='block';}
+function addDrug(){const r=document.createElement('div');r.className='drug-row';r.innerHTML='<input type="text" placeholder="Drug name"/><input class="dos" type="text" placeholder="Dosage"/><button class="rmv" onclick="rmvDrug(this)">×</button>';document.getElementById('drug-rows').appendChild(r);}
+function rmvDrug(btn){const rows=document.getElementById('drug-rows');if(rows.children.length>1)btn.closest('.drug-row').remove();}
+function sendRx(){const s=document.getElementById('rx-sent');s.style.display='inline';setTimeout(()=>s.style.display='none',2500);}
+function saveP(){const s=document.getElementById('p-saved');s.style.display='inline';setTimeout(()=>s.style.display='none',2500);}
+function savePP(){const s=document.getElementById('pp-saved');s.style.display='inline';setTimeout(()=>s.style.display='none',2500);}
+</script>
+</body>
+</html>
